@@ -48,6 +48,28 @@ createApp({
         getDailySaved(activity) {
             return (activity.currentTime - activity.newTime) * activity.frequency;
         },
+        calculateImpactPerRole(role) {
+            let totalImpact = 0;
+            this.activities.forEach(activity => {
+                if (activity.role === role) {
+                    const savedTimePerDay = this.getDailySaved(activity);
+                    const workingDaysPerYear = activity.workingDaysPerMonth * 12;
+                    const savedHoursPerYear = (savedTimePerDay * workingDaysPerYear) / 3600;
+                    const savings = savedHoursPerYear * this.roles[role].rate;
+                    totalImpact += savings;
+                }
+            });
+            return totalImpact / this.roles[role].count; // Per person in role
+        },
+        getWeeklyImpactPerRole(role) {
+            return this.calculateImpactPerRole(role) / 52; // Divide yearly impact by 52 weeks
+        },
+        getMonthlyImpactPerRole(role) {
+            return this.calculateImpactPerRole(role) / 12; // Divide yearly impact by 12 months
+        },
+        getYearlyImpactPerRole(role) {
+            return this.calculateImpactPerRole(role);
+        },
         calculateImpact() {
             let totalYearlySavings = 0;
 
@@ -69,25 +91,6 @@ createApp({
         },
         getWeeklyImpact() {
             return this.getMonthlyImpact() / 4.33;
-        },
-        getWeeklyImpactPerRole(role) {
-            let totalImpact = 0;
-            this.activities.forEach(activity => {
-                if (activity.role === role) {
-                    const savedTimePerDay = this.getDailySaved(activity);
-                    const workingDaysPerYear = activity.workingDaysPerMonth * 12;
-                    const savedHoursPerYear = (savedTimePerDay * workingDaysPerYear) / 3600;
-                    const savings = (savedHoursPerYear * this.roles[role].rate) / 52; // Divide by 52 weeks
-                    totalImpact += savings;
-                }
-            });
-            return totalImpact / this.roles[role].count; // Divide by number of people in role
-        },
-        getMonthlyImpactPerRole(role) {
-            return this.getWeeklyImpactPerRole(role) * 4.33; // Average weeks per month
-        },
-        getYearlyImpactPerRole(role) {
-            return this.getWeeklyImpactPerRole(role) * 52; // Weeks per year
         },
         updateChart() {
             const ctx = document.getElementById('impactChart');
