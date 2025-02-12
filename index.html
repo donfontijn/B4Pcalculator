@@ -27,7 +27,7 @@
             <div class="space-y-6">
                 <div v-for="(activity, index) in activities" :key="activity.id" class="border rounded-lg p-6 bg-gray-50">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg">Activity {{index + 1}}</h3>
+                        <h3 class="text-lg">Activity {{ index + 1 }}</h3>
                         <button @click="removeActivity(index)" class="text-red-500 hover:text-red-700">
                             Remove
                         </button>
@@ -51,7 +51,7 @@
                                 @change="activity.peopleCount = roles[activity.role].count"
                                 class="w-full p-2 border rounded"
                             >
-                                <option v-for="(roleData, role) in roles" :value="role">{{role}}</option>
+                                <option v-for="(roleData, role) in roles" :value="role">{{ role }}</option>
                             </select>
                         </div>
                     </div>
@@ -59,11 +59,11 @@
                     <div class="space-y-6">
                         <div>
                             <label class="block mb-2">
-                                Current Time ({{formatTime(activity.currentTime)}})
+                                Current Time ({{ formatTime(activity.currentTime) }})
                             </label>
                             <input
                                 type="range"
-                                v-model="activity.currentTime"
+                                v-model.number="activity.currentTime"
                                 :min="10"
                                 :max="600"
                                 class="w-full"
@@ -73,11 +73,11 @@
 
                         <div>
                             <label class="block mb-2">
-                                Time After Innovation ({{formatTime(activity.newTime)}})
+                                Time After Innovation ({{ formatTime(activity.newTime) }})
                             </label>
                             <input
                                 type="range"
-                                v-model="activity.newTime"
+                                v-model.number="activity.newTime"
                                 :min="0"
                                 :max="activity.currentTime"
                                 class="w-full"
@@ -86,11 +86,11 @@
 
                         <div>
                             <label class="block mb-2">
-                                Average Days per Month this Activity is Executed ({{activity.workingDaysPerMonth}} days)
+                                Average Days per Month this Activity is Executed ({{ activity.workingDaysPerMonth }} days)
                             </label>
                             <input
                                 type="range"
-                                v-model="activity.workingDaysPerMonth"
+                                v-model.number="activity.workingDaysPerMonth"
                                 :min="1"
                                 :max="23"
                                 class="w-full"
@@ -101,7 +101,7 @@
                             <label class="block mb-2">Frequency per Day</label>
                             <input
                                 type="number"
-                                v-model="activity.frequency"
+                                v-model.number="activity.frequency"
                                 class="w-full p-2 border rounded"
                                 min="1"
                                 placeholder="Enter times per day"
@@ -110,7 +110,7 @@
                     </div>
 
                     <div class="mt-4 text-sm text-gray-600">
-                        Daily time saved: {{Math.round(getDailySaved(activity) / 60)}} minutes
+                        Daily time saved: {{ Math.round(getDailySaved(activity) / 60) }} minutes
                     </div>
                 </div>
             </div>
@@ -135,15 +135,15 @@
                 <div class="grid grid-cols-3 gap-6">
                     <div>
                         <p class="text-sm text-gray-600">Weekly Impact</p>
-                        <p class="text-lg">€{{formatMoney(getWeeklyImpact())}}</p>
+                        <p class="text-lg">€{{ formatMoney(getWeeklyImpact()) }}</p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-600">Monthly Impact</p>
-                        <p class="text-lg">€{{formatMoney(getMonthlyImpact())}}</p>
+                        <p class="text-lg">€{{ formatMoney(getMonthlyImpact()) }}</p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-600">Yearly Impact</p>
-                        <p class="text-lg">€{{formatMoney(getYearlyImpact())}}</p>
+                        <p class="text-lg">€{{ formatMoney(getYearlyImpact()) }}</p>
                     </div>
                 </div>
             </div>
