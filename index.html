@@ -1,45 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B4P Innovation Impact Calculator</title>
+    <title>B4P Innovatie Impact Calculator</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
     <style>[v-cloak] { display: none; }</style>
 </head>
 <body class="bg-gray-100 min-h-screen p-8">
     <div id="app" class="max-w-4xl mx-auto" v-cloak>
         <div class="bg-white rounded-lg shadow-lg p-8">
-            <h1 class="text-2xl font-bold mb-6">B4P Innovation Impact Calculator</h1>
+            <h1 class="text-2xl font-bold mb-6">B4P Innovatie Impact Calculator</h1>
             
             <div class="mb-6">
-                <label class="block mb-2">Innovation Name</label>
+                <label class="block mb-2">Naam Innovatie</label>
                 <input
                     type="text"
                     v-model="innovationName"
                     class="w-full p-2 border rounded"
-                    placeholder="Enter innovation name"
+                    placeholder="Voer de naam van de innovatie in"
                 >
             </div>
 
             <div class="space-y-6">
                 <div v-for="(activity, index) in activities" :key="activity.id" class="border rounded-lg p-6 bg-gray-50">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg">Activity {{ index + 1 }}</h3>
-                        <button @click="removeActivity(index)" class="text-red-500 hover:text-red-700">Remove</button>
+                        <h3 class="text-lg">Activiteit {{ index + 1 }}</h3>
+                        <button @click="removeActivity(index)" class="text-red-500 hover:text-red-700">Verwijderen</button>
                     </div>
 
                     <div class="grid grid-cols-2 gap-6 mb-4">
                         <div>
-                            <label class="block mb-2">Activity Name</label>
-                            <input type="text" v-model="activity.name" class="w-full p-2 border rounded" placeholder="Enter activity name">
+                            <label class="block mb-2">Naam Activiteit</label>
+                            <input type="text" v-model="activity.name" class="w-full p-2 border rounded" placeholder="Voer activiteitnaam in">
                         </div>
 
                         <div>
-                            <label class="block mb-2">Role</label>
+                            <label class="block mb-2">Rol</label>
                             <select v-model="activity.role" class="w-full p-2 border rounded">
                                 <option v-for="(data, role) in roles" :key="role" :value="role">{{ role }}</option>
                             </select>
@@ -48,57 +51,79 @@
 
                     <div class="space-y-6">
                         <div>
-                            <label class="block mb-2">Current Time ({{ formatTime(activity.currentTime) }})</label>
+                            <label class="block mb-2">Huidige Tijd ({{ formatTime(activity.currentTime) }})</label>
                             <input type="range" v-model.number="activity.currentTime" min="10" max="600" class="w-full">
                         </div>
 
                         <div>
-                            <label class="block mb-2">Time After Innovation ({{ formatTime(activity.newTime) }})</label>
+                            <label class="block mb-2">Tijd Na Innovatie ({{ formatTime(activity.newTime) }})</label>
                             <input type="range" v-model.number="activity.newTime" min="0" :max="activity.currentTime" class="w-full">
                         </div>
 
                         <div>
                             <label class="block mb-2">
-                                Average Days per Month this Activity is Executed ({{ activity.workingDaysPerMonth }} days)
+                                Gemiddeld Aantal Dagen per Maand ({{ activity.workingDaysPerMonth }} dagen)
                             </label>
                             <input type="range" v-model.number="activity.workingDaysPerMonth" min="1" max="23" class="w-full">
                         </div>
 
                         <div>
-                            <label class="block mb-2">Frequency per Day</label>
-                            <input type="number" v-model.number="activity.frequency" class="w-full p-2 border rounded" min="1" placeholder="Enter times per day">
+                            <label class="block mb-2">Frequentie per Dag</label>
+                            <input type="number" v-model.number="activity.frequency" class="w-full p-2 border rounded" min="1" placeholder="Voer aantal keer per dag in">
                         </div>
                     </div>
 
                     <div class="mt-4 text-sm text-gray-600">
-                        Daily time saved: {{ Math.round(getDailySaved(activity) / 60) }} minutes
+                        Dagelijkse tijdsbesparing: {{ Math.round(getDailySaved(activity) / 60) }} minuten
                     </div>
                 </div>
             </div>
 
             <div class="flex gap-4 mb-8 mt-6">
                 <button @click="addActivity" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                    Add Activity
+                    Activiteit Toevoegen
                 </button>
                 <button @click="downloadPDF" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                    Download PDF Report
+                    PDF Rapport Downloaden
                 </button>
             </div>
 
             <div class="bg-blue-50 p-6 rounded-lg">
                 <h3 class="font-medium mb-4">Business Case Impact</h3>
-                <div class="grid grid-cols-3 gap-6">
+                
+                <div class="mb-6 text-sm text-gray-600">
+                    <p class="mb-4">Bij het beoordelen van de financiële impact van dit innovatievoorstel is het belangrijk om rekening te houden met onzekerheden rondom het gebruik van de ontwikkelde scripts en tools. Hoewel de potentiële besparingen aanzienlijk zijn, varieert de frequentie waarmee de scripts worden ingezet per project.</p>
+                    
+                    <p class="mb-4">Om een realistisch beeld te schetsen van de financiële haalbaarheid, presenteren we drie scenario's:</p>
+                    <ul class="list-disc pl-5 mb-4">
+                        <li class="text-blue-600">Optimistisch scenario: Het maximale gebruik van de scripts (100%)</li>
+                        <li class="text-green-600">Realistisch scenario: Een gematigd gebruik van de scripts (70%)</li>
+                        <li class="text-yellow-600">Conservatief scenario: Minder frequent gebruik van de scripts (50%)</li>
+                    </ul>
+                </div>
+
+                <div class="h-80 w-full">
+                    <div id="scenarioChart"></div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-6 mt-6">
                     <div>
-                        <p class="text-sm text-gray-600">Weekly Impact</p>
+                        <p class="text-sm text-gray-600">Wekelijkse Impact (100%)</p>
                         <p class="text-lg">€{{ formatMoney(getWeeklyImpact()) }}</p>
+                        <p class="text-sm text-gray-600 mt-2">(70%) €{{ formatMoney(getWeeklyImpact() * 0.7) }}</p>
+                        <p class="text-sm text-gray-600">(50%) €{{ formatMoney(getWeeklyImpact() * 0.5) }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Monthly Impact</p>
+                        <p class="text-sm text-gray-600">Maandelijkse Impact (100%)</p>
                         <p class="text-lg">€{{ formatMoney(getMonthlyImpact()) }}</p>
+                        <p class="text-sm text-gray-600 mt-2">(70%) €{{ formatMoney(getMonthlyImpact() * 0.7) }}</p>
+                        <p class="text-sm text-gray-600">(50%) €{{ formatMoney(getMonthlyImpact() * 0.5) }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Yearly Impact</p>
+                        <p class="text-sm text-gray-600">Jaarlijkse Impact (100%)</p>
                         <p class="text-lg">€{{ formatMoney(getYearlyImpact()) }}</p>
+                        <p class="text-sm text-gray-600 mt-2">(70%) €{{ formatMoney(getYearlyImpact() * 0.7) }}</p>
+                        <p class="text-sm text-gray-600">(50%) €{{ formatMoney(getYearlyImpact() * 0.5) }}</p>
                     </div>
                 </div>
             </div>
@@ -106,5 +131,49 @@
     </div>
 
     <script src="calculator.js"></script>
+    <script>
+        function renderChart(data) {
+            const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } = Recharts;
+            
+            const chart = React.createElement(LineChart, {
+                width: 800,
+                height: 300,
+                data: data,
+                margin: { top: 5, right: 30, left: 20, bottom: 5 }
+            }, [
+                React.createElement(CartesianGrid, { strokeDasharray: "3 3" }),
+                React.createElement(XAxis, { dataKey: "period" }),
+                React.createElement(YAxis, { label: { value: 'Impact (€)', angle: -90, position: 'insideLeft' } }),
+                React.createElement(Tooltip, { formatter: (value) => ["€" + value.toLocaleString()] }),
+                React.createElement(Legend),
+                React.createElement(Line, {
+                    type: "monotone",
+                    dataKey: "optimistic",
+                    stroke: "#3B82F6",
+                    name: "Optimistisch (100%)"
+                }),
+                React.createElement(Line, {
+                    type: "monotone",
+                    dataKey: "realistic",
+                    stroke: "#10B981",
+                    name: "Realistisch (70%)"
+                }),
+                React.createElement(Line, {
+                    type: "monotone",
+                    dataKey: "conservative",
+                    stroke: "#FBBF24",
+                    name: "Conservatief (50%)"
+                })
+            ]);
+
+            ReactDOM.render(chart, document.getElementById('scenarioChart'));
+        }
+
+        // Watch for changes in the Vue app's chartData
+        const app = document.querySelector('#app').__vue_app__;
+        app.config.globalProperties.$watch('chartData', (newData) => {
+            renderChart(newData);
+        }, { deep: true, immediate: true });
+    </script>
 </body>
 </html>
