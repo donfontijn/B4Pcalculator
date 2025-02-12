@@ -7,6 +7,7 @@ createApp({
             activities: [],
             chart: null,
             updateChartTimeout: null,
+            showInfo: false,
             roles: {
                 'BIM Regisseur': { rate: 85, count: 1 },
                 'BIM Coordinatoren': { rate: 60, count: 2 },
@@ -267,6 +268,15 @@ createApp({
         this.$nextTick(() => {
             this.updateChart();
         });
+        
+        // Add click outside handler for info popup
+        document.addEventListener('click', (e) => {
+            const infoButton = e.target.closest('button');
+            const infoPopover = e.target.closest('.relative');
+            if (!infoButton && !infoPopover && this.showInfo) {
+                this.showInfo = false;
+            }
+        });
     },
     watch: {
         activities: {
@@ -286,5 +296,6 @@ createApp({
         if (this.updateChartTimeout) {
             clearTimeout(this.updateChartTimeout);
         }
+        document.removeEventListener('click', this.handleClickOutside);
     }
 }).mount('#app');

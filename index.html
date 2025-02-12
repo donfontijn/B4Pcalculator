@@ -84,7 +84,29 @@
             </div>
 
             <div class="bg-blue-50 p-6 rounded-lg">
-                <h3 class="font-medium mb-4">Business Case Impact</h3>
+                <div class="flex items-center gap-2 mb-4">
+                    <h3 class="font-medium">Business Case Impact</h3>
+                    <div class="relative">
+                        <button 
+                            @click="showInfo = !showInfo"
+                            class="text-blue-500 hover:text-blue-700 rounded-full w-5 h-5 flex items-center justify-center border border-current"
+                        >
+                            i
+                        </button>
+                        <!-- Info Popover -->
+                        <div 
+                            v-if="showInfo"
+                            class="absolute left-0 top-full mt-2 p-4 bg-white rounded-lg shadow-lg border border-gray-200 w-80 z-10"
+                        >
+                            <p class="text-sm text-gray-600 mb-3">
+                                Bij het beoordelen van de financiële impact van dit innovatievoorstel is het belangrijk om rekening te houden met onzekerheden rondom het gebruik van de ontwikkelde scripts en tools. Hoewel de potentiële besparingen aanzienlijk zijn, varieert de frequentie waarmee de scripts worden ingezet per project.
+                            </p>
+                            <p class="text-sm text-gray-600">
+                                Deze berekening is gebaseerd op het totaal aantal medewerkers per rol (bijvoorbeeld 8 junior modellers) en hun respectievelijke uurtarieven.
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- Total Impact (Realistic Scenario) First -->
                 <div class="bg-green-100 p-4 rounded-lg mb-6">
