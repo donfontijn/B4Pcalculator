@@ -8,9 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
     <style>[v-cloak] { display: none; }</style>
 </head>
 <body class="bg-gray-100 min-h-screen p-8">
@@ -102,10 +99,6 @@
                     </ul>
                 </div>
 
-                <div class="h-80 w-full">
-                    <div id="scenarioChart"></div>
-                </div>
-
                 <div class="grid grid-cols-3 gap-6 mt-6">
                     <div>
                         <p class="text-sm text-gray-600">Wekelijkse Impact (100%)</p>
@@ -131,49 +124,5 @@
     </div>
 
     <script src="calculator.js"></script>
-    <script>
-        function renderChart(data) {
-            const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } = Recharts;
-            
-            const chart = React.createElement(LineChart, {
-                width: 800,
-                height: 300,
-                data: data,
-                margin: { top: 5, right: 30, left: 20, bottom: 5 }
-            }, [
-                React.createElement(CartesianGrid, { strokeDasharray: "3 3" }),
-                React.createElement(XAxis, { dataKey: "period" }),
-                React.createElement(YAxis, { label: { value: 'Impact (€)', angle: -90, position: 'insideLeft' } }),
-                React.createElement(Tooltip, { formatter: (value) => ["€" + value.toLocaleString()] }),
-                React.createElement(Legend),
-                React.createElement(Line, {
-                    type: "monotone",
-                    dataKey: "optimistic",
-                    stroke: "#3B82F6",
-                    name: "Optimistisch (100%)"
-                }),
-                React.createElement(Line, {
-                    type: "monotone",
-                    dataKey: "realistic",
-                    stroke: "#10B981",
-                    name: "Realistisch (70%)"
-                }),
-                React.createElement(Line, {
-                    type: "monotone",
-                    dataKey: "conservative",
-                    stroke: "#FBBF24",
-                    name: "Conservatief (50%)"
-                })
-            ]);
-
-            ReactDOM.render(chart, document.getElementById('scenarioChart'));
-        }
-
-        // Watch for changes in the Vue app's chartData
-        const app = document.querySelector('#app').__vue_app__;
-        app.config.globalProperties.$watch('chartData', (newData) => {
-            renderChart(newData);
-        }, { deep: true, immediate: true });
-    </script>
 </body>
 </html>

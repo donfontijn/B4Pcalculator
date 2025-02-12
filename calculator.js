@@ -5,6 +5,7 @@ createApp({
         return {
             innovationName: '',
             activities: [],
+            chartData: [],
             roles: {
                 'BIM Regisseur': { rate: 85, count: 1 },
                 'BIM Coordinatoren': { rate: 60, count: 2 },
@@ -13,8 +14,7 @@ createApp({
                 'BIM Modelleur - Senior': { rate: 55, count: 8 },
                 'Projectmanagers': { rate: 55, count: 2 },
                 'Softwaredeveloper': { rate: 55, count: 1 }
-            },
-            chartData: []
+            }
         }
     },
     methods: {
@@ -73,11 +73,116 @@ createApp({
         },
         updateChartData() {
             const yearlyImpact = this.getYearlyImpact();
+            const monthlyImpact = this.getMonthlyImpact();
+            const weeklyImpact = this.getWeeklyImpact();
+
+            // Update chart data with the three scenarios
             this.chartData = [
-                { period: 'Week', optimistic: Math.round(yearlyImpact / 52), realistic: Math.round(yearlyImpact * 0.7 / 52), conservative: Math.round(yearlyImpact * 0.5 / 52) },
-                { period: 'Month', optimistic: Math.round(yearlyImpact / 12), realistic: Math.round(yearlyImpact * 0.7 / 12), conservative: Math.round(yearlyImpact * 0.5 / 12) },
-                { period: 'Year', optimistic: Math.round(yearlyImpact), realistic: Math.round(yearlyImpact * 0.7), conservative: Math.round(yearlyImpact * 0.5) }
+                { name: 'Week', scenarioA: weeklyImpact, scenarioB: weeklyImpact * 0.7, scenarioC: weeklyImpact * 0.5 },
+                { name: 'Maand', scenarioA: monthlyImpact, scenarioB: monthlyImpact * 0.7, scenarioC: monthlyImpact * 0.5 },
+                { name: 'Jaar', scenarioA: yearlyImpact, scenarioB: yearlyImpact * 0.7, scenarioC: yearlyImpact * 0.5 }
             ];
+
+            // Create new chart instance
+            const data = this.chartData;
+            const margin = { top: 20, right: 20, bottom: 30, left: 60 };
+            const width = 600 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+
+            // Clear previous chart
+            d3.select("#impact-chart").html("");
+
+            const svg = d3.select("#impact-chart")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // X axis
+            const x = d3.scaleBand()
+                .range([0, width])
+                .domain(data.map(d => d.name))
+                .padding(0.2);
+
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x));
+
+            // Y axis
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => Math.max(d.scenarioA, d.scenarioB, d.scenarioC))])
+                .range([height, 0]);
+
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            // Add bars for each scenario
+            const barWidth = x.bandwidth() / 3;
+
+            // Scenario A bars (100%)
+            svg.selectAll(".bar-a")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "bar-a")
+                .attr("x", d => x(d.name))
+                .attr("y", d => y(d.scenarioA))
+                .attr("width", barWidth)
+                .attr("height", d => height - y(d.scenarioA))
+                .attr("fill", "#3B82F6");
+
+            // Scenario B bars (70%)
+            svg.selectAll(".bar-b")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "bar-b")
+                .attr("x", d => x(d.name) + barWidth)
+                .attr("y", d => y(d.scenarioB))
+                .attr("width", barWidth)
+                .attr("height", d => height - y(d.scenarioB))
+                .attr("fill", "#10B981");
+
+            // Scenario C bars (50%)
+            svg.selectAll(".bar-c")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "bar-c")
+                .attr("x", d => x(d.name) + 2 * barWidth)
+                .attr("y", d => y(d.scenarioC))
+                .attr("width", barWidth)
+                .attr("height", d => height - y(d.scenarioC))
+                .attr("fill", "#FBBF24");
+
+            // Add legend
+            const legend = svg.append("g")
+                .attr("class", "legend")
+                .attr("transform", `translate(${width - 120}, 0)`);
+
+            const scenarios = [
+                { name: "100%", color: "#3B82F6" },
+                { name: "70%", color: "#10B981" },
+                { name: "50%", color: "#FBBF24" }
+            ];
+
+            scenarios.forEach((scenario, i) => {
+                const legendRow = legend.append("g")
+                    .attr("transform", `translate(0, ${i * 20})`);
+
+                legendRow.append("rect")
+                    .attr("width", 10)
+                    .attr("height", 10)
+                    .attr("fill", scenario.color);
+
+                legendRow.append("text")
+                    .attr("x", 20)
+                    .attr("y", 10)
+                    .attr("text-anchor", "start")
+                    .style("font-size", "12px")
+                    .text(scenario.name);
+            });
         },
         downloadPDF() {
             const { jsPDF } = window.jspdf;
@@ -85,30 +190,30 @@ createApp({
             
             // Title
             doc.setFontSize(20);
-            doc.text('B4P Innovation Impact Calculator Report', 20, 20);
+            doc.text('B4P Innovatie Impact Calculator Rapport', 20, 20);
             
             // Innovation Name
             doc.setFontSize(16);
-            doc.text(`Innovation: ${this.innovationName || 'Untitled'}`, 20, 35);
+            doc.text(`Innovatie: ${this.innovationName || 'Naamloos'}`, 20, 35);
             
             // Date
             doc.setFontSize(12);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 45);
+            doc.text(`Gegenereerd op: ${new Date().toLocaleString('nl-NL')}`, 20, 45);
             
             // Activities Table
             const tableData = this.activities.map(activity => [
-                activity.name || 'Unnamed activity',
+                activity.name || 'Naamloze activiteit',
                 activity.role,
                 this.formatTime(activity.currentTime),
                 this.formatTime(activity.newTime),
-                activity.frequency + 'x/day',
-                activity.workingDaysPerMonth + ' days/month',
-                Math.round(this.getDailySaved(activity) / 60) + ' minutes/day'
+                activity.frequency + 'x per dag',
+                activity.workingDaysPerMonth + ' dagen/maand',
+                Math.round(this.getDailySaved(activity) / 60) + ' minuten/dag'
             ]);
 
             doc.autoTable({
                 startY: 55,
-                head: [['Activity', 'Role', 'Current Time', 'New Time', 'Frequency', 'Working Days', 'Time Saved']],
+                head: [['Activiteit', 'Rol', 'Huidige Tijd', 'Nieuwe Tijd', 'Frequentie', 'Werkdagen', 'Tijdsbesparing']],
                 body: tableData,
                 theme: 'striped',
                 headStyles: { fillColor: [41, 128, 185] }
@@ -117,44 +222,50 @@ createApp({
             // Financial Impact
             const impactY = doc.previousAutoTable.finalY + 20;
             doc.setFontSize(16);
-            doc.text('Financial Impact', 20, impactY);
+            doc.text('Financiële Impact', 20, impactY);
 
-            // Scenarios
+            // Add chart image
+            const chartSvg = document.querySelector('#impact-chart svg');
+            if (chartSvg) {
+                const svgData = new XMLSerializer().serializeToString(chartSvg);
+                const canvas = document.createElement('canvas');
+                canvg(canvas, svgData);
+                const imgData = canvas.toDataURL('image/png');
+                doc.addImage(imgData, 'PNG', 15, impactY + 10, 180, 120);
+            }
+
+            // Scenarios text below chart
+            const scenariosY = impactY + 140;
             doc.setFontSize(12);
-            doc.text('Optimistic Scenario (100%)', 20, impactY + 15);
-            doc.text(`Weekly Impact: €${this.formatMoney(this.getWeeklyImpact())}`, 30, impactY + 22);
-            doc.text(`Monthly Impact: €${this.formatMoney(this.getMonthlyImpact())}`, 30, impactY + 29);
-            doc.text(`Yearly Impact: €${this.formatMoney(this.getYearlyImpact())}`, 30, impactY + 36);
-
-            doc.text('Realistic Scenario (70%)', 20, impactY + 46);
-            doc.text(`Weekly Impact: €${this.formatMoney(this.getWeeklyImpact() * 0.7)}`, 30, impactY + 53);
-            doc.text(`Monthly Impact: €${this.formatMoney(this.getMonthlyImpact() * 0.7)}`, 30, impactY + 60);
-            doc.text(`Yearly Impact: €${this.formatMoney(this.getYearlyImpact() * 0.7)}`, 30, impactY + 67);
-
-            doc.text('Conservative Scenario (50%)', 20, impactY + 77);
-            doc.text(`Weekly Impact: €${this.formatMoney(this.getWeeklyImpact() * 0.5)}`, 30, impactY + 84);
-            doc.text(`Monthly Impact: €${this.formatMoney(this.getMonthlyImpact() * 0.5)}`, 30, impactY + 91);
-            doc.text(`Yearly Impact: €${this.formatMoney(this.getYearlyImpact() * 0.5)}`, 30, impactY + 98);
-
-            // Additional Information
-            doc.setFontSize(10);
-            doc.text('Calculation based on:', 20, impactY + 108);
-            doc.text('- Individual working days per month for each activity', 25, impactY + 115);
-            doc.text('- Hourly rates per role', 25, impactY + 122);
-            doc.text('- Three scenarios: optimistic (100%), realistic (70%), conservative (50%)', 25, impactY + 129);
             
-            // Ensure a clean filename by removing special characters
-            const cleanFileName = (this.innovationName || 'unnamed-innovation')
+            doc.text('Optimistisch Scenario (100%)', 20, scenariosY);
+            doc.text(`Wekelijks: €${this.formatMoney(this.getWeeklyImpact())}`, 30, scenariosY + 7);
+            doc.text(`Maandelijks: €${this.formatMoney(this.getMonthlyImpact())}`, 30, scenariosY + 14);
+            doc.text(`Jaarlijks: €${this.formatMoney(this.getYearlyImpact())}`, 30, scenariosY + 21);
+
+            doc.text('Realistisch Scenario (70%)', 20, scenariosY + 35);
+            doc.text(`Wekelijks: €${this.formatMoney(this.getWeeklyImpact() * 0.7)}`, 30, scenariosY + 42);
+            doc.text(`Maandelijks: €${this.formatMoney(this.getMonthlyImpact() * 0.7)}`, 30, scenariosY + 49);
+            doc.text(`Jaarlijks: €${this.formatMoney(this.getYearlyImpact() * 0.7)}`, 30, scenariosY + 56);
+
+            doc.text('Conservatief Scenario (50%)', 20, scenariosY + 70);
+            doc.text(`Wekelijks: €${this.formatMoney(this.getWeeklyImpact() * 0.5)}`, 30, scenariosY + 77);
+            doc.text(`Maandelijks: €${this.formatMoney(this.getMonthlyImpact() * 0.5)}`, 30, scenariosY + 84);
+            doc.text(`Jaarlijks: €${this.formatMoney(this.getYearlyImpact() * 0.5)}`, 30, scenariosY + 91);
+            
+            // Save the PDF
+            const cleanFileName = (this.innovationName || 'innovatie')
                 .toLowerCase()
                 .replace(/[^a-z0-9]/g, '-')
                 .replace(/-+/g, '-')
                 .replace(/^-|-$/g, '');
-                
-            doc.save(`${cleanFileName}-impact-report.pdf`);
+            
+            doc.save(`${cleanFileName}-impact-rapport.pdf`);
         }
     },
     mounted() {
         this.addActivity();
+        this.updateChartData();
     },
     watch: {
         activities: {
@@ -165,46 +276,3 @@ createApp({
         }
     }
 }).mount('#app');
-<script>
-function renderChart(data) {
-    const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } = Recharts;
-    const chart = React.createElement(LineChart, {
-        width: 800,
-        height: 300,
-        data: data,
-        margin: { top: 5, right: 30, left: 20, bottom: 5 }
-    }, [
-        React.createElement(CartesianGrid, { strokeDasharray: "3 3" }),
-        React.createElement(XAxis, { dataKey: "period" }),
-        React.createElement(YAxis, { label: { value: 'Impact (€)', angle: -90, position: 'insideLeft' } }),
-        React.createElement(Tooltip, { formatter: (value) => ["€" + value.toLocaleString()] }),
-        React.createElement(Legend),
-        React.createElement(Line, {
-            type: "monotone",
-            dataKey: "optimistic",
-            stroke: "#3B82F6",
-            name: "Optimistisch (100%)"
-        }),
-        React.createElement(Line, {
-            type: "monotone",
-            dataKey: "realistic",
-            stroke: "#10B981",
-            name: "Realistisch (70%)"
-        }),
-        React.createElement(Line, {
-            type: "monotone",
-            dataKey: "conservative",
-            stroke: "#FBBF24",
-            name: "Conservatief (50%)"
-        })
-    ]);
-
-    ReactDOM.render(chart, document.getElementById('scenarioChart'));
-}
-
-// Watch for changes in the Vue app's chartData
-const app = document.querySelector('#app').__vue_app__;
-app.config.globalProperties.$watch('chartData', (newData) => {
-    renderChart(newData);
-}, { deep: true, immediate: true });
-</script>
