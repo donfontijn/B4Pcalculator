@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Innovation Impact Calculator</title>
+    <title>B4P Innovation Impact Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -12,7 +12,7 @@
 <body class="bg-gray-100 min-h-screen p-8">
     <div id="app" class="max-w-4xl mx-auto">
         <div class="bg-white rounded-lg shadow-lg p-6">
-            <h1 class="text-2xl font-bold mb-6">Innovation Impact Calculator</h1>
+            <h1 class="text-2xl font-bold mb-6">B4P Innovation Impact Calculator</h1>
             
             <div class="mb-6">
                 <label class="block text-sm font-medium mb-2">Innovation Name</label>
