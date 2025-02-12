@@ -166,23 +166,20 @@ createApp({
             doc.setFontSize(20);
             doc.text('B4P Innovatie Impact Calculator Rapport', 20, 20);
             
-            // Innovation Name
-            doc.setFontSize(16);
-            doc.text(`Innovatie: ${this.innovationName || 'Naamloos'}`, 20, 35);
-            
-            // Date
+            // Innovation Name and Date
             doc.setFontSize(12);
+            doc.text(`Innovatie: ${this.innovationName || 'Naamloos'}`, 20, 35);
             doc.text(`Gegenereerd op: ${new Date().toLocaleString('nl-NL')}`, 20, 45);
             
             // Activities Table
             const tableData = this.activities.map(activity => [
                 activity.name || 'Naamloze activiteit',
                 activity.role,
-                this.formatTime(activity.currentTime),
-                this.formatTime(activity.newTime),
-                activity.frequency + 'x per dag',
-                activity.workingDaysPerMonth + ' dagen/maand',
-                Math.round(this.getDailySaved(activity) / 60) + ' minuten/dag'
+                `${activity.currentTime}s`,
+                `${activity.newTime}s`,
+                `${activity.frequency}x per dag`,
+                `${activity.workingDaysPerMonth} dagen/maand`,
+                `${Math.round(this.getDailySaved(activity) / 60)} minuten/dag`
             ]);
 
             doc.autoTable({
@@ -190,42 +187,61 @@ createApp({
                 head: [['Activiteit', 'Rol', 'Huidige Tijd', 'Nieuwe Tijd', 'Frequentie', 'Werkdagen', 'Tijdsbesparing']],
                 body: tableData,
                 theme: 'striped',
-                headStyles: { fillColor: [41, 128, 185] }
+                headStyles: { fillColor: [0, 101, 163] },
+                styles: { fontSize: 8 },
+                columnStyles: {
+                    0: { cellWidth: 30 },
+                    1: { cellWidth: 30 },
+                    2: { cellWidth: 20 },
+                    3: { cellWidth: 20 },
+                    4: { cellWidth: 25 },
+                    5: { cellWidth: 25 },
+                    6: { cellWidth: 30 }
+                }
             });
 
-            // Financial Impact
+            // Financial Impact Section
             const impactY = doc.previousAutoTable.finalY + 20;
             doc.setFontSize(16);
             doc.text('Financiële Impact', 20, impactY);
 
-            // Add chart image
-            const canvas = document.getElementById('impactChart');
-            if (canvas) {
-                const imgData = canvas.toDataURL('image/png');
-                doc.addImage(imgData, 'PNG', 15, impactY + 10, 180, 100);
-            }
+            // Impact Scenarios in three columns
+            const startY = impactY + 15;
+            const columnWidth = 60;
+            const leftMargin = 20;
 
-            // Scenarios
-            const scenariosY = impactY + 120;
+            // Column 1: Optimistic
             doc.setFontSize(12);
+            doc.text('Optimistisch (100%)', leftMargin, startY);
+            doc.setFontSize(10);
+            doc.text(`Wekelijks:`, leftMargin, startY + 7);
+            doc.text(`€${this.formatMoney(this.getWeeklyImpact())}`, leftMargin, startY + 12);
+            doc.text(`Maandelijks:`, leftMargin, startY + 19);
+            doc.text(`€${this.formatMoney(this.getMonthlyImpact())}`, leftMargin, startY + 24);
+            doc.text(`Jaarlijks:`, leftMargin, startY + 31);
+            doc.text(`€${this.formatMoney(this.getYearlyImpact())}`, leftMargin, startY + 36);
 
-            // Optimistic Scenario
-            doc.text('Optimistisch Scenario (100%)', 20, scenariosY);
-            doc.text(`Wekelijks: €${this.formatMoney(this.getWeeklyImpact())}`, 30, scenariosY + 7);
-            doc.text(`Maandelijks: €${this.formatMoney(this.getMonthlyImpact())}`, 30, scenariosY + 14);
-            doc.text(`Jaarlijks: €${this.formatMoney(this.getYearlyImpact())}`, 30, scenariosY + 21);
+            // Column 2: Realistic
+            doc.setFontSize(12);
+            doc.text('Realistisch (70%)', leftMargin + columnWidth, startY);
+            doc.setFontSize(10);
+            doc.text(`Wekelijks:`, leftMargin + columnWidth, startY + 7);
+            doc.text(`€${this.formatMoney(this.getWeeklyImpact() * 0.7)}`, leftMargin + columnWidth, startY + 12);
+            doc.text(`Maandelijks:`, leftMargin + columnWidth, startY + 19);
+            doc.text(`€${this.formatMoney(this.getMonthlyImpact() * 0.7)}`, leftMargin + columnWidth, startY + 24);
+            doc.text(`Jaarlijks:`, leftMargin + columnWidth, startY + 31);
+            doc.text(`€${this.formatMoney(this.getYearlyImpact() * 0.7)}`, leftMargin + columnWidth, startY + 36);
 
-            // Realistic Scenario
-            doc.text('Realistisch Scenario (70%)', 20, scenariosY + 35);
-            doc.text(`Wekelijks: €${this.formatMoney(this.getWeeklyImpact() * 0.7)}`, 30, scenariosY + 42);
-            doc.text(`Maandelijks: €${this.formatMoney(this.getMonthlyImpact() * 0.7)}`, 30, scenariosY + 49);
-            doc.text(`Jaarlijks: €${this.formatMoney(this.getYearlyImpact() * 0.7)}`, 30, scenariosY + 56);
-
-            // Conservative Scenario
-            doc.text('Conservatief Scenario (50%)', 20, scenariosY + 70);
-            doc.text(`Wekelijks: €${this.formatMoney(this.getWeeklyImpact() * 0.5)}`, 30, scenariosY + 77);
-            doc.text(`Maandelijks: €${this.formatMoney(this.getMonthlyImpact() * 0.5)}`, 30, scenariosY + 84);
-            doc.text(`Jaarlijks: €${this.formatMoney(this.getYearlyImpact() * 0.5)}`, 30, scenariosY + 91);
+            // Column 3: Conservative
+            doc.setFontSize(12);
+            doc.text('Conservatief (50%)', leftMargin + (columnWidth * 2), startY);
+            doc.setFontSize(10);
+            doc.text(`Wekelijks:`, leftMargin + (columnWidth * 2), startY + 7);
+            doc.text(`€${this.formatMoney(this.getWeeklyImpact() * 0.5)}`, leftMargin + (columnWidth * 2), startY + 12);
+            doc.text(`Maandelijks:`, leftMargin + (columnWidth * 2), startY + 19);
+            doc.text(`€${this.formatMoney(this.getMonthlyImpact() * 0.5)}`, leftMargin + (columnWidth * 2), startY + 24);
+            doc.text(`Jaarlijks:`, leftMargin + (columnWidth * 2), startY + 31);
+            doc.text(`€${this.formatMoney(this.getYearlyImpact() * 0.5)}`, leftMargin + (columnWidth * 2), startY + 36);
 
             // Save the PDF
             const cleanFileName = (this.innovationName || 'innovatie')
