@@ -72,77 +72,68 @@ createApp({
         },
         updateChart() {
             const ctx = document.getElementById('impactChart');
-            
             if (!ctx) return;
 
             const weeklyImpact = this.getWeeklyImpact();
             const monthlyImpact = this.getMonthlyImpact();
             const yearlyImpact = this.getYearlyImpact();
 
-            const config = {
-                type: 'bar',
-                data: {
-                    labels: ['Wekelijks', 'Maandelijks', 'Jaarlijks'],
-                    datasets: [
-                        {
-                            label: 'Optimistisch (100%)',
-                            data: [weeklyImpact, monthlyImpact, yearlyImpact],
-                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                            borderColor: 'rgb(59, 130, 246)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Realistisch (70%)',
-                            data: [weeklyImpact * 0.7, monthlyImpact * 0.7, yearlyImpact * 0.7],
-                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                            borderColor: 'rgb(16, 185, 129)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Conservatief (50%)',
-                            data: [weeklyImpact * 0.5, monthlyImpact * 0.5, yearlyImpact * 0.5],
-                            backgroundColor: 'rgba(251, 191, 36, 0.8)',
-                            borderColor: 'rgb(251, 191, 36)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: 0 // Disable animations for smoother updates
+            const data = {
+                labels: ['Wekelijks', 'Maandelijks', 'Jaarlijks'],
+                datasets: [
+                    {
+                        label: 'Optimistisch (100%)',
+                        data: [weeklyImpact, monthlyImpact, yearlyImpact],
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        borderColor: 'rgb(59, 130, 246)',
+                        borderWidth: 1
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '€' + new Intl.NumberFormat().format(Math.round(value));
+                    {
+                        label: 'Realistisch (70%)',
+                        data: [weeklyImpact * 0.7, monthlyImpact * 0.7, yearlyImpact * 0.7],
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderColor: 'rgb(16, 185, 129)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Conservatief (50%)',
+                        data: [weeklyImpact * 0.5, monthlyImpact * 0.5, yearlyImpact * 0.5],
+                        backgroundColor: 'rgba(251, 191, 36, 0.8)',
+                        borderColor: 'rgb(251, 191, 36)',
+                        borderWidth: 1
+                    }
+                ]
+            };
+
+            if (!this.chart) {
+                this.chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: (value) => '€' + Math.round(value).toLocaleString()
                                 }
                             }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': €' + 
-                                           new Intl.NumberFormat().format(Math.round(context.raw));
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => 
+                                        `${context.dataset.label}: €${Math.round(context.raw).toLocaleString()}`
                                 }
                             }
                         }
                     }
-                }
-            };
-
-            if (this.chart) {
-                // Update existing chart
-                this.chart.data = config.data;
-                this.chart.update('none'); // Update without animation
+                });
             } else {
-                // Create new chart
-                this.chart = new Chart(ctx, config);
+                this.chart.data.datasets = data.datasets;
+                this.chart.update('none');
             }
         },
         downloadPDF() {
@@ -233,13 +224,10 @@ createApp({
     watch: {
         activities: {
             deep: true,
-            handler(newVal, oldVal) {
-                if (this.updateChartTimeout) {
-                    clearTimeout(this.updateChartTimeout);
-                }
-                this.updateChartTimeout = setTimeout(() => {
+            handler() {
+                requestAnimationFrame(() => {
                     this.updateChart();
-                }, 100);
+                });
             }
         }
     },
