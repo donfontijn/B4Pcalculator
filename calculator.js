@@ -154,7 +154,7 @@ createApp({
                     }
                 });
             } else {
-                this.chart.data.datasets = data.datasets;
+                this.chart.data = data;
                 this.chart.update('none');
             }
         },
@@ -262,7 +262,7 @@ createApp({
     watch: {
         activities: {
             deep: true,
-            handler() {
+            handler(newVal) {
                 requestAnimationFrame(() => {
                     this.updateChart();
                 });
