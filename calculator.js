@@ -93,12 +93,18 @@ createApp({
             return this.getMonthlyImpact() / 4.33;
         },
         updateChart() {
+            console.log('Updating chart...');
             const ctx = document.getElementById('impactChart');
-            if (!ctx) return;
+            if (!ctx) {
+                console.log('Canvas not found');
+                return;
+            }
 
             const weeklyImpact = this.getWeeklyImpact();
             const monthlyImpact = this.getMonthlyImpact();
             const yearlyImpact = this.getYearlyImpact();
+
+            console.log('Impacts:', { weeklyImpact, monthlyImpact, yearlyImpact });
 
             const data = {
                 labels: ['Wekelijks', 'Maandelijks', 'Jaarlijks'],
@@ -128,6 +134,7 @@ createApp({
             };
 
             if (!this.chart) {
+                console.log('Creating new chart');
                 this.chart = new Chart(ctx, {
                     type: 'bar',
                     data: data,
@@ -154,6 +161,7 @@ createApp({
                     }
                 });
             } else {
+                console.log('Updating existing chart');
                 this.chart.data = data;
                 this.chart.update('none');
             }
@@ -254,6 +262,7 @@ createApp({
         }
     },
     mounted() {
+        console.log('Component mounted');
         this.addActivity();
         this.$nextTick(() => {
             this.updateChart();
@@ -263,6 +272,7 @@ createApp({
         activities: {
             deep: true,
             handler(newVal) {
+                console.log('Activities changed');
                 requestAnimationFrame(() => {
                     this.updateChart();
                 });
