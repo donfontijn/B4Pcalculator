@@ -13,7 +13,8 @@ createApp({
                 'BIM Modelleur - Senior': { rate: 55, count: 8 },
                 'Projectmanagers': { rate: 55, count: 2 },
                 'Softwaredeveloper': { rate: 55, count: 1 }
-            }
+            },
+            chartData: []
         }
     },
     methods: {
@@ -28,9 +29,11 @@ createApp({
                 workingDaysPerMonth: 20,
                 peopleCount: this.roles[Object.keys(this.roles)[0]].count
             });
+            this.updateChartData();
         },
         removeActivity(index) {
             this.activities.splice(index, 1);
+            this.updateChartData();
         },
         formatTime(seconds) {
             if (seconds >= 60) {
@@ -67,6 +70,14 @@ createApp({
         },
         getWeeklyImpact() {
             return this.getMonthlyImpact() / 4.33;
+        },
+        updateChartData() {
+            const yearlyImpact = this.getYearlyImpact();
+            this.chartData = [
+                { period: 'Week', optimistic: Math.round(yearlyImpact / 52), realistic: Math.round(yearlyImpact * 0.7 / 52), conservative: Math.round(yearlyImpact * 0.5 / 52) },
+                { period: 'Month', optimistic: Math.round(yearlyImpact / 12), realistic: Math.round(yearlyImpact * 0.7 / 12), conservative: Math.round(yearlyImpact * 0.5 / 12) },
+                { period: 'Year', optimistic: Math.round(yearlyImpact), realistic: Math.round(yearlyImpact * 0.7), conservative: Math.round(yearlyImpact * 0.5) }
+            ];
         },
         downloadPDF() {
             const { jsPDF } = window.jspdf;
@@ -108,16 +119,29 @@ createApp({
             doc.setFontSize(16);
             doc.text('Financial Impact', 20, impactY);
 
+            // Scenarios
             doc.setFontSize(12);
-            doc.text(`Weekly Impact: €${this.formatMoney(this.getWeeklyImpact())}`, 20, impactY + 10);
-            doc.text(`Monthly Impact: €${this.formatMoney(this.getMonthlyImpact())}`, 20, impactY + 20);
-            doc.text(`Yearly Impact: €${this.formatMoney(this.getYearlyImpact())}`, 20, impactY + 30);
+            doc.text('Optimistic Scenario (100%)', 20, impactY + 15);
+            doc.text(`Weekly Impact: €${this.formatMoney(this.getWeeklyImpact())}`, 30, impactY + 22);
+            doc.text(`Monthly Impact: €${this.formatMoney(this.getMonthlyImpact())}`, 30, impactY + 29);
+            doc.text(`Yearly Impact: €${this.formatMoney(this.getYearlyImpact())}`, 30, impactY + 36);
+
+            doc.text('Realistic Scenario (70%)', 20, impactY + 46);
+            doc.text(`Weekly Impact: €${this.formatMoney(this.getWeeklyImpact() * 0.7)}`, 30, impactY + 53);
+            doc.text(`Monthly Impact: €${this.formatMoney(this.getMonthlyImpact() * 0.7)}`, 30, impactY + 60);
+            doc.text(`Yearly Impact: €${this.formatMoney(this.getYearlyImpact() * 0.7)}`, 30, impactY + 67);
+
+            doc.text('Conservative Scenario (50%)', 20, impactY + 77);
+            doc.text(`Weekly Impact: €${this.formatMoney(this.getWeeklyImpact() * 0.5)}`, 30, impactY + 84);
+            doc.text(`Monthly Impact: €${this.formatMoney(this.getMonthlyImpact() * 0.5)}`, 30, impactY + 91);
+            doc.text(`Yearly Impact: €${this.formatMoney(this.getYearlyImpact() * 0.5)}`, 30, impactY + 98);
 
             // Additional Information
             doc.setFontSize(10);
-            doc.text('Calculation based on:', 20, impactY + 45);
-            doc.text('- Individual working days per month for each activity', 25, impactY + 52);
-            doc.text('- Hourly rates per role', 25, impactY + 59);
+            doc.text('Calculation based on:', 20, impactY + 108);
+            doc.text('- Individual working days per month for each activity', 25, impactY + 115);
+            doc.text('- Hourly rates per role', 25, impactY + 122);
+            doc.text('- Three scenarios: optimistic (100%), realistic (70%), conservative (50%)', 25, impactY + 129);
             
             // Ensure a clean filename by removing special characters
             const cleanFileName = (this.innovationName || 'unnamed-innovation')
@@ -131,5 +155,13 @@ createApp({
     },
     mounted() {
         this.addActivity();
+    },
+    watch: {
+        activities: {
+            deep: true,
+            handler() {
+                this.updateChartData();
+            }
+        }
     }
 }).mount('#app');
