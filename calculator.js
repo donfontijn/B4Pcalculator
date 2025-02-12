@@ -283,10 +283,28 @@ createApp({
             deep: true,
             handler(newVal) {
                 console.log('Activities changed');
-                requestAnimationFrame(() => {
+                // Clear existing chart
+                if (this.chart) {
+                    this.chart.destroy();
+                    this.chart = null;
+                }
+                // Create new chart
+                this.$nextTick(() => {
                     this.updateChart();
                 });
             }
+        },
+        'activities.*.currentTime': function() {
+            this.updateChart();
+        },
+        'activities.*.newTime': function() {
+            this.updateChart();
+        },
+        'activities.*.frequency': function() {
+            this.updateChart();
+        },
+        'activities.*.workingDaysPerMonth': function() {
+            this.updateChart();
         }
     },
     beforeUnmount() {
