@@ -120,22 +120,43 @@
                 <!-- Detailed Breakdown -->
                 <div class="grid grid-cols-3 gap-6 mt-6">
                     <div>
-                        <p class="text-sm text-gray-600">Wekelijks</p>
-                        <p class="text-lg font-medium">€{{ formatMoney(getWeeklyImpact() * 0.7) }}</p>
-                        <p class="text-sm text-gray-600 mt-2">Optimistisch: €{{ formatMoney(getWeeklyImpact()) }}</p>
-                        <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getWeeklyImpact() * 0.5) }}</p>
+                        <p class="text-sm text-gray-600">Wekelijks per persoon</p>
+                        <div class="space-y-2">
+                            <template v-for="(data, role) in roles" :key="role">
+                                <div v-if="getWeeklyImpactPerRole(role) > 0" class="text-sm">
+                                    <p class="font-medium">{{ role }}:</p>
+                                    <p>€{{ formatMoney(getWeeklyImpactPerRole(role) * 0.7) }}</p>
+                                    <p class="text-xs text-gray-500">Optimistisch: €{{ formatMoney(getWeeklyImpactPerRole(role)) }}</p>
+                                    <p class="text-xs text-gray-500">Conservatief: €{{ formatMoney(getWeeklyImpactPerRole(role) * 0.5) }}</p>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Maandelijks</p>
-                        <p class="text-lg font-medium">€{{ formatMoney(getMonthlyImpact() * 0.7) }}</p>
-                        <p class="text-sm text-gray-600 mt-2">Optimistisch: €{{ formatMoney(getMonthlyImpact()) }}</p>
-                        <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getMonthlyImpact() * 0.5) }}</p>
+                        <p class="text-sm text-gray-600">Maandelijks per persoon</p>
+                        <div class="space-y-2">
+                            <template v-for="(data, role) in roles" :key="role">
+                                <div v-if="getMonthlyImpactPerRole(role) > 0" class="text-sm">
+                                    <p class="font-medium">{{ role }}:</p>
+                                    <p>€{{ formatMoney(getMonthlyImpactPerRole(role) * 0.7) }}</p>
+                                    <p class="text-xs text-gray-500">Optimistisch: €{{ formatMoney(getMonthlyImpactPerRole(role)) }}</p>
+                                    <p class="text-xs text-gray-500">Conservatief: €{{ formatMoney(getMonthlyImpactPerRole(role) * 0.5) }}</p>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Jaarlijks</p>
-                        <p class="text-lg font-medium">€{{ formatMoney(getYearlyImpact() * 0.7) }}</p>
-                        <p class="text-sm text-gray-600 mt-2">Optimistisch: €{{ formatMoney(getYearlyImpact()) }}</p>
-                        <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getYearlyImpact() * 0.5) }}</p>
+                        <p class="text-sm text-gray-600">Jaarlijks per persoon</p>
+                        <div class="space-y-2">
+                            <template v-for="(data, role) in roles" :key="role">
+                                <div v-if="getYearlyImpactPerRole(role) > 0" class="text-sm">
+                                    <p class="font-medium">{{ role }}:</p>
+                                    <p>€{{ formatMoney(getYearlyImpactPerRole(role) * 0.7) }}</p>
+                                    <p class="text-xs text-gray-500">Optimistisch: €{{ formatMoney(getYearlyImpactPerRole(role)) }}</p>
+                                    <p class="text-xs text-gray-500">Conservatief: €{{ formatMoney(getYearlyImpactPerRole(role) * 0.5) }}</p>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </div>
