@@ -92,7 +92,7 @@ createApp({
                 this.formatTime(activity.newTime),
                 activity.frequency + 'x/day',
                 activity.workingDaysPerMonth + ' days/month',
-                this.formatTime(this.getDailySaved(activity)) + '/day'
+                Math.round(this.getDailySaved(activity) / 60) + ' minutes/day'
             ]);
 
             doc.autoTable({
