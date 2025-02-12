@@ -6,13 +6,13 @@ createApp({
             innovationName: '',
             activities: [],
             roles: {
-                'BIM Regisseur': 85,
-                'BIM Coordinatoren': 60,
-                'Quality Engineers': 55,
-                'BIM Modelleur - Junior': 40,
-                'BIM Modelleur - Senior': 55,
-                'Teamcaptains': 55,
-                'Softwaredeveloper': 55
+                'BIM Regisseur': { rate: 85, count: 1 },
+                'BIM Coordinatoren': { rate: 60, count: 2 },
+                'Quality Engineers': { rate: 55, count: 2 },
+                'BIM Modelleur - Junior': { rate: 40, count: 8 },  // Half of current 16
+                'BIM Modelleur - Senior': { rate: 55, count: 8 },  // Half of current 16
+                'Projectmanagers': { rate: 55, count: 2 },
+                'Softwaredeveloper': { rate: 55, count: 1 }
             }
         }
     },
@@ -24,7 +24,8 @@ createApp({
                 currentTime: 30,
                 newTime: 15,
                 frequency: 1,
-                workingDaysPerMonth: 20
+                workingDaysPerMonth: 20,
+                peopleCount: this.roles[Object.keys(this.roles)[0]].count
             });
         },
         removeActivity(index) {
@@ -88,6 +89,7 @@ createApp({
             const tableData = this.activities.map(activity => [
                 activity.name || 'Unnamed activity',
                 activity.role,
+                activity.peopleCount + ' people',
                 this.formatTime(activity.currentTime),
                 this.formatTime(activity.newTime),
                 activity.frequency + 'x/day',
@@ -97,7 +99,7 @@ createApp({
 
             doc.autoTable({
                 startY: 55,
-                head: [['Activity', 'Role', 'Current Time', 'New Time', 'Frequency', 'Working Days', 'Time Saved']],
+                head: [['Activity', 'Role', 'People', 'Current Time', 'New Time', 'Frequency', 'Working Days', 'Time Saved']],
                 body: tableData,
                 theme: 'striped',
                 headStyles: { fillColor: [41, 128, 185] }
