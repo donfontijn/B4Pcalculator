@@ -75,21 +75,26 @@ createApp({
             let totalYearlySavings = 0;
 
             this.activities.forEach(activity => {
-                const savedTimePerDay = this.getDailySaved(activity);
-                const workingDaysPerYear = activity.workingDaysPerMonth * 12;
-                const savedHoursPerYear = (savedTimePerDay * workingDaysPerYear) / 3600;
-                const savings = savedHoursPerYear * this.roles[activity.role].rate * activity.peopleCount;
+                // Time saved per item in minutes
+                const timePerItem = ((activity.currentTime - activity.newTime) / 60); // Convert seconds to minutes
                 
-                console.log('Debug:', { 
-                    role: activity.role,
-                    savedTimePerDay, 
-                    workingDaysPerYear, 
-                    savedHoursPerYear, 
+                // Daily savings in hours
+                const dailySavingsHours = (timePerItem * activity.frequency) / 60; // Convert minutes to hours
+                
+                // Yearly savings in hours
+                const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * 12);
+                
+                // Cost savings
+                const savings = yearlyHours * this.roles[activity.role].rate;
+                
+                console.log('Debug calculation:', {
+                    timePerItem,
+                    dailySavingsHours,
+                    yearlyHours,
                     rate: this.roles[activity.role].rate,
-                    peopleCount: activity.peopleCount,
-                    savings 
+                    savings
                 });
-                
+
                 totalYearlySavings += savings;
             });
 
