@@ -5,7 +5,7 @@ createApp({
         return {
             innovationName: '',
             activities: [],
-            chartData: [],
+            chart: null,
             roles: {
                 'BIM Regisseur': { rate: 85, count: 1 },
                 'BIM Coordinatoren': { rate: 60, count: 2 },
@@ -29,11 +29,11 @@ createApp({
                 workingDaysPerMonth: 20,
                 peopleCount: this.roles[Object.keys(this.roles)[0]].count
             });
-            this.updateChartData();
+            this.updateChart();
         },
         removeActivity(index) {
             this.activities.splice(index, 1);
-            this.updateChartData();
+            this.updateChart();
         },
         formatTime(seconds) {
             if (seconds >= 60) {
@@ -71,117 +71,61 @@ createApp({
         getWeeklyImpact() {
             return this.getMonthlyImpact() / 4.33;
         },
-        updateChartData() {
+        updateChart() {
+            const ctx = document.getElementById('impactChart');
+            if (this.chart) {
+                this.chart.destroy();
+            }
+
             const yearlyImpact = this.getYearlyImpact();
             const monthlyImpact = this.getMonthlyImpact();
             const weeklyImpact = this.getWeeklyImpact();
 
-            // Update chart data with the three scenarios
-            this.chartData = [
-                { name: 'Week', scenarioA: weeklyImpact, scenarioB: weeklyImpact * 0.7, scenarioC: weeklyImpact * 0.5 },
-                { name: 'Maand', scenarioA: monthlyImpact, scenarioB: monthlyImpact * 0.7, scenarioC: monthlyImpact * 0.5 },
-                { name: 'Jaar', scenarioA: yearlyImpact, scenarioB: yearlyImpact * 0.7, scenarioC: yearlyImpact * 0.5 }
-            ];
-
-            // Create new chart instance
-            const data = this.chartData;
-            const margin = { top: 20, right: 20, bottom: 30, left: 60 };
-            const width = 600 - margin.left - margin.right;
-            const height = 400 - margin.top - margin.bottom;
-
-            // Clear previous chart
-            d3.select("#impact-chart").html("");
-
-            const svg = d3.select("#impact-chart")
-                .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-                .append("g")
-                .attr("transform", `translate(${margin.left},${margin.top})`);
-
-            // X axis
-            const x = d3.scaleBand()
-                .range([0, width])
-                .domain(data.map(d => d.name))
-                .padding(0.2);
-
-            svg.append("g")
-                .attr("transform", `translate(0,${height})`)
-                .call(d3.axisBottom(x));
-
-            // Y axis
-            const y = d3.scaleLinear()
-                .domain([0, d3.max(data, d => Math.max(d.scenarioA, d.scenarioB, d.scenarioC))])
-                .range([height, 0]);
-
-            svg.append("g")
-                .call(d3.axisLeft(y));
-
-            // Add bars for each scenario
-            const barWidth = x.bandwidth() / 3;
-
-            // Scenario A bars (100%)
-            svg.selectAll(".bar-a")
-                .data(data)
-                .enter()
-                .append("rect")
-                .attr("class", "bar-a")
-                .attr("x", d => x(d.name))
-                .attr("y", d => y(d.scenarioA))
-                .attr("width", barWidth)
-                .attr("height", d => height - y(d.scenarioA))
-                .attr("fill", "#3B82F6");
-
-            // Scenario B bars (70%)
-            svg.selectAll(".bar-b")
-                .data(data)
-                .enter()
-                .append("rect")
-                .attr("class", "bar-b")
-                .attr("x", d => x(d.name) + barWidth)
-                .attr("y", d => y(d.scenarioB))
-                .attr("width", barWidth)
-                .attr("height", d => height - y(d.scenarioB))
-                .attr("fill", "#10B981");
-
-            // Scenario C bars (50%)
-            svg.selectAll(".bar-c")
-                .data(data)
-                .enter()
-                .append("rect")
-                .attr("class", "bar-c")
-                .attr("x", d => x(d.name) + 2 * barWidth)
-                .attr("y", d => y(d.scenarioC))
-                .attr("width", barWidth)
-                .attr("height", d => height - y(d.scenarioC))
-                .attr("fill", "#FBBF24");
-
-            // Add legend
-            const legend = svg.append("g")
-                .attr("class", "legend")
-                .attr("transform", `translate(${width - 120}, 0)`);
-
-            const scenarios = [
-                { name: "100%", color: "#3B82F6" },
-                { name: "70%", color: "#10B981" },
-                { name: "50%", color: "#FBBF24" }
-            ];
-
-            scenarios.forEach((scenario, i) => {
-                const legendRow = legend.append("g")
-                    .attr("transform", `translate(0, ${i * 20})`);
-
-                legendRow.append("rect")
-                    .attr("width", 10)
-                    .attr("height", 10)
-                    .attr("fill", scenario.color);
-
-                legendRow.append("text")
-                    .attr("x", 20)
-                    .attr("y", 10)
-                    .attr("text-anchor", "start")
-                    .style("font-size", "12px")
-                    .text(scenario.name);
+            this.chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Week', 'Maand', 'Jaar'],
+                    datasets: [
+                        {
+                            label: 'Optimistisch (100%)',
+                            data: [weeklyImpact, monthlyImpact, yearlyImpact],
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)'
+                        },
+                        {
+                            label: 'Realistisch (70%)',
+                            data: [weeklyImpact * 0.7, monthlyImpact * 0.7, yearlyImpact * 0.7],
+                            backgroundColor: 'rgba(16, 185, 129, 0.8)'
+                        },
+                        {
+                            label: 'Conservatief (50%)',
+                            data: [weeklyImpact * 0.5, monthlyImpact * 0.5, yearlyImpact * 0.5],
+                            backgroundColor: 'rgba(251, 191, 36, 0.8)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '€' + new Intl.NumberFormat().format(Math.round(value));
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': €' + 
+                                           new Intl.NumberFormat().format(Math.round(context.raw));
+                                }
+                            }
+                        }
+                    }
+                }
             });
         },
         downloadPDF() {
@@ -225,17 +169,14 @@ createApp({
             doc.text('Financiële Impact', 20, impactY);
 
             // Add chart image
-            const chartSvg = document.querySelector('#impact-chart svg');
-            if (chartSvg) {
-                const svgData = new XMLSerializer().serializeToString(chartSvg);
-                const canvas = document.createElement('canvas');
-                canvg(canvas, svgData);
+            const canvas = document.getElementById('impactChart');
+            if (canvas) {
                 const imgData = canvas.toDataURL('image/png');
-                doc.addImage(imgData, 'PNG', 15, impactY + 10, 180, 120);
+                doc.addImage(imgData, 'PNG', 15, impactY + 10, 180, 100);
             }
 
             // Scenarios text below chart
-            const scenariosY = impactY + 140;
+            const scenariosY = impactY + 120;
             doc.setFontSize(12);
             
             doc.text('Optimistisch Scenario (100%)', 20, scenariosY);
@@ -265,13 +206,17 @@ createApp({
     },
     mounted() {
         this.addActivity();
-        this.updateChartData();
+        this.$nextTick(() => {
+            this.updateChart();
+        });
     },
     watch: {
         activities: {
             deep: true,
             handler() {
-                this.updateChartData();
+                this.$nextTick(() => {
+                    this.updateChart();
+                });
             }
         }
     }
