@@ -86,10 +86,25 @@
             <div class="bg-blue-50 p-6 rounded-lg">
                 <h3 class="font-medium mb-4">Business Case Impact</h3>
                 
+                <!-- Total Impact (Realistic Scenario) First -->
+                <div class="bg-green-100 p-4 rounded-lg mb-6">
+                    <h4 class="text-lg font-medium mb-2">Verwachte Jaarlijkse Besparing (Realistisch Scenario)</h4>
+                    <p class="text-3xl font-bold mb-2">€{{ formatMoney(getYearlyImpact() * 0.7) }}</p>
+                    <div class="text-sm text-gray-600">
+                        <p>Optimistisch scenario (100%): €{{ formatMoney(getYearlyImpact()) }}</p>
+                        <p>Conservatief scenario (50%): €{{ formatMoney(getYearlyImpact() * 0.5) }}</p>
+                    </div>
+                </div>
+
+                <!-- Explanation Text -->
                 <div class="mb-6 text-sm text-gray-600">
                     <p class="mb-4">Bij het beoordelen van de financiële impact van dit innovatievoorstel is het belangrijk om rekening te houden met onzekerheden rondom het gebruik van de ontwikkelde scripts en tools. Hoewel de potentiële besparingen aanzienlijk zijn, varieert de frequentie waarmee de scripts worden ingezet per project.</p>
-                    
-                    <p class="mb-4">Om een realistisch beeld te schetsen van de financiële haalbaarheid, presenteren we drie scenario's:</p>
+                    <p class="mb-4">Deze berekening is gebaseerd op het totaal aantal medewerkers per rol (bijvoorbeeld 8 junior modellers) en hun respectievelijke uurtarieven.</p>
+                </div>
+
+                <!-- Scenarios List -->
+                <div class="mb-6">
+                    <p class="mb-2">We presenteren drie scenario's:</p>
                     <ul class="list-disc pl-5 mb-4">
                         <li class="text-blue-600">Optimistisch scenario: Het maximale gebruik van de scripts (100%)</li>
                         <li class="text-green-600">Realistisch scenario: Een gematigd gebruik van de scripts (70%)</li>
@@ -97,28 +112,30 @@
                     </ul>
                 </div>
 
+                <!-- Chart -->
                 <div class="mb-6">
                     <canvas id="impactChart" height="200"></canvas>
                 </div>
 
+                <!-- Detailed Breakdown -->
                 <div class="grid grid-cols-3 gap-6 mt-6">
                     <div>
-                        <p class="text-sm text-gray-600">Wekelijkse Impact (100%)</p>
-                        <p class="text-lg">€{{ formatMoney(getWeeklyImpact()) }}</p>
-                        <p class="text-sm text-gray-600 mt-2">(70%) €{{ formatMoney(getWeeklyImpact() * 0.7) }}</p>
-                        <p class="text-sm text-gray-600">(50%) €{{ formatMoney(getWeeklyImpact() * 0.5) }}</p>
+                        <p class="text-sm text-gray-600">Wekelijks</p>
+                        <p class="text-lg font-medium">€{{ formatMoney(getWeeklyImpact() * 0.7) }}</p>
+                        <p class="text-sm text-gray-600 mt-2">Optimistisch: €{{ formatMoney(getWeeklyImpact()) }}</p>
+                        <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getWeeklyImpact() * 0.5) }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Maandelijkse Impact (100%)</p>
-                        <p class="text-lg">€{{ formatMoney(getMonthlyImpact()) }}</p>
-                        <p class="text-sm text-gray-600 mt-2">(70%) €{{ formatMoney(getMonthlyImpact() * 0.7) }}</p>
-                        <p class="text-sm text-gray-600">(50%) €{{ formatMoney(getMonthlyImpact() * 0.5) }}</p>
+                        <p class="text-sm text-gray-600">Maandelijks</p>
+                        <p class="text-lg font-medium">€{{ formatMoney(getMonthlyImpact() * 0.7) }}</p>
+                        <p class="text-sm text-gray-600 mt-2">Optimistisch: €{{ formatMoney(getMonthlyImpact()) }}</p>
+                        <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getMonthlyImpact() * 0.5) }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Jaarlijkse Impact (100%)</p>
-                        <p class="text-lg">€{{ formatMoney(getYearlyImpact()) }}</p>
-                        <p class="text-sm text-gray-600 mt-2">(70%) €{{ formatMoney(getYearlyImpact() * 0.7) }}</p>
-                        <p class="text-sm text-gray-600">(50%) €{{ formatMoney(getYearlyImpact() * 0.5) }}</p>
+                        <p class="text-sm text-gray-600">Jaarlijks</p>
+                        <p class="text-lg font-medium">€{{ formatMoney(getYearlyImpact() * 0.7) }}</p>
+                        <p class="text-sm text-gray-600 mt-2">Optimistisch: €{{ formatMoney(getYearlyImpact()) }}</p>
+                        <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getYearlyImpact() * 0.5) }}</p>
                     </div>
                 </div>
             </div>
