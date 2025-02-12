@@ -129,50 +129,33 @@
                     <canvas id="impactChart"></canvas>
                 </div>
 
-                <!-- Per Role Breakdown -->
-                <div class="grid grid-cols-3 gap-6 mt-6">
-                    <!-- Weekly Column -->
+                <!-- Role breakdown section -->
+                <div class="grid grid-cols-3 gap-4 mt-6">
                     <div>
-                        <p class="text-sm text-gray-600">Wekelijks per rol</p>
-                        <div class="space-y-4 mt-2">
-                            <template v-for="(data, role) in roles" :key="role">
-                                <div v-if="calculateImpactPerRole(role) > 0" class="text-sm">
-                                    <p class="font-medium">{{ role }}:</p>
-                                    <p>€{{ formatMoney(calculateImpactPerRole(role) / 52 * 0.7) }}</p>
-                                    <p class="text-xs text-gray-500">Optimistisch: €{{ formatMoney(calculateImpactPerRole(role) / 52) }}</p>
-                                    <p class="text-xs text-gray-500">Conservatief: €{{ formatMoney(calculateImpactPerRole(role) / 52 * 0.5) }}</p>
-                                </div>
-                            </template>
+                        <h5 class="font-medium mb-4">Wekelijks per rol</h5>
+                        <div v-for="activity in activities" :key="activity.id" class="mb-4">
+                            <p class="font-medium">{{ activity.role }}:</p>
+                            <p>€{{ formatMoney(getWeeklyImpactPerPerson(activity) * 0.7) }}</p>
+                            <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getWeeklyImpactPerPerson(activity)) }}</p>
+                            <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getWeeklyImpactPerPerson(activity) * 0.5) }}</p>
                         </div>
                     </div>
-
-                    <!-- Monthly Column -->
                     <div>
-                        <p class="text-sm text-gray-600">Maandelijks per rol</p>
-                        <div class="space-y-4 mt-2">
-                            <template v-for="(data, role) in roles" :key="role">
-                                <div v-if="calculateImpactPerRole(role) > 0" class="text-sm">
-                                    <p class="font-medium">{{ role }}:</p>
-                                    <p>€{{ formatMoney(calculateImpactPerRole(role) / 12 * 0.7) }}</p>
-                                    <p class="text-xs text-gray-500">Optimistisch: €{{ formatMoney(calculateImpactPerRole(role) / 12) }}</p>
-                                    <p class="text-xs text-gray-500">Conservatief: €{{ formatMoney(calculateImpactPerRole(role) / 12 * 0.5) }}</p>
-                                </div>
-                            </template>
+                        <h5 class="font-medium mb-4">Maandelijks per rol</h5>
+                        <div v-for="activity in activities" :key="activity.id" class="mb-4">
+                            <p class="font-medium">{{ activity.role }}:</p>
+                            <p>€{{ formatMoney(getMonthlyImpactPerPerson(activity) * 0.7) }}</p>
+                            <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getMonthlyImpactPerPerson(activity)) }}</p>
+                            <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getMonthlyImpactPerPerson(activity) * 0.5) }}</p>
                         </div>
                     </div>
-
-                    <!-- Yearly Column -->
                     <div>
-                        <p class="text-sm text-gray-600">Jaarlijks per rol</p>
-                        <div class="space-y-4 mt-2">
-                            <template v-for="(data, role) in roles" :key="role">
-                                <div v-if="calculateImpactPerRole(role) > 0" class="text-sm">
-                                    <p class="font-medium">{{ role }}:</p>
-                                    <p>€{{ formatMoney(calculateImpactPerRole(role) * 0.7) }}</p>
-                                    <p class="text-xs text-gray-500">Optimistisch: €{{ formatMoney(calculateImpactPerRole(role)) }}</p>
-                                    <p class="text-xs text-gray-500">Conservatief: €{{ formatMoney(calculateImpactPerRole(role) * 0.5) }}</p>
-                                </div>
-                            </template>
+                        <h5 class="font-medium mb-4">Jaarlijks per rol</h5>
+                        <div v-for="activity in activities" :key="activity.id" class="mb-4">
+                            <p class="font-medium">{{ activity.role }}:</p>
+                            <p>€{{ formatMoney(getYearlyImpactPerPerson(activity) * 0.7) }}</p>
+                            <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getYearlyImpactPerPerson(activity)) }}</p>
+                            <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getYearlyImpactPerPerson(activity) * 0.5) }}</p>
                         </div>
                     </div>
                 </div>

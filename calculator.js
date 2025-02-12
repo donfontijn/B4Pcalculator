@@ -84,21 +84,35 @@ createApp({
                 // Yearly savings in hours
                 const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * 12);
                 
-                // Cost savings
-                const savings = yearlyHours * this.roles[activity.role].rate;
-                
-                console.log('Debug calculation:', {
-                    timePerItem,
-                    dailySavingsHours,
-                    yearlyHours,
-                    rate: this.roles[activity.role].rate,
-                    savings
-                });
+                // Cost savings (multiply by number of people in role)
+                const savings = yearlyHours * this.roles[activity.role].rate * this.roles[activity.role].count;
 
                 totalYearlySavings += savings;
             });
 
             return totalYearlySavings;
+        },
+        calculateImpactPerPerson(activity) {
+            // Time saved per item in minutes
+            const timePerItem = ((activity.currentTime - activity.newTime) / 60);
+            
+            // Daily savings in hours
+            const dailySavingsHours = (timePerItem * activity.frequency) / 60;
+            
+            // Yearly savings in hours
+            const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * 12);
+            
+            // Cost savings (single person)
+            return yearlyHours * this.roles[activity.role].rate;
+        },
+        getYearlyImpactPerPerson(activity) {
+            return this.calculateImpactPerPerson(activity);
+        },
+        getMonthlyImpactPerPerson(activity) {
+            return this.calculateImpactPerPerson(activity) / 12;
+        },
+        getWeeklyImpactPerPerson(activity) {
+            return this.calculateImpactPerPerson(activity) / 52;
         },
         getYearlyImpact() {
             return this.calculateImpact();
