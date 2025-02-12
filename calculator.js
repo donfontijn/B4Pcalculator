@@ -6,6 +6,7 @@ createApp({
             innovationName: '',
             activities: [],
             chart: null,
+            updateChartTimeout: null,
             roles: {
                 'BIM Regisseur': { rate: 85, count: 1 },
                 'BIM Coordinatoren': { rate: 60, count: 2 },
@@ -72,15 +73,13 @@ createApp({
         updateChart() {
             const ctx = document.getElementById('impactChart');
             
-            if (this.chart) {
-                this.chart.destroy();
-            }
+            if (!ctx) return;
 
             const weeklyImpact = this.getWeeklyImpact();
             const monthlyImpact = this.getMonthlyImpact();
             const yearlyImpact = this.getYearlyImpact();
 
-            this.chart = new Chart(ctx, {
+            const config = {
                 type: 'bar',
                 data: {
                     labels: ['Wekelijks', 'Maandelijks', 'Jaarlijks'],
@@ -111,6 +110,9 @@ createApp({
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 0 // Disable animations for smoother updates
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -132,7 +134,16 @@ createApp({
                         }
                     }
                 }
-            });
+            };
+
+            if (this.chart) {
+                // Update existing chart
+                this.chart.data = config.data;
+                this.chart.update('none'); // Update without animation
+            } else {
+                // Create new chart
+                this.chart = new Chart(ctx, config);
+            }
         },
         downloadPDF() {
             const { jsPDF } = window.jspdf;
@@ -222,11 +233,22 @@ createApp({
     watch: {
         activities: {
             deep: true,
-            handler() {
-                this.$nextTick(() => {
+            handler(newVal, oldVal) {
+                if (this.updateChartTimeout) {
+                    clearTimeout(this.updateChartTimeout);
+                }
+                this.updateChartTimeout = setTimeout(() => {
                     this.updateChart();
-                });
+                }, 100);
             }
+        }
+    },
+    beforeUnmount() {
+        if (this.chart) {
+            this.chart.destroy();
+        }
+        if (this.updateChartTimeout) {
+            clearTimeout(this.updateChartTimeout);
         }
     }
 }).mount('#app');
