@@ -14,6 +14,7 @@ createApp({
                 'Quality Engineers': { rate: 55, count: 2 },
                 'BIM Modelleur - Junior': { rate: 40, count: 8 },
                 'BIM Modelleur - Senior': { rate: 55, count: 8 },
+                'Teamcaptain': { rate: 55, count: 3 },
                 'Projectmanagers': { rate: 55, count: 2 },
                 'Softwaredeveloper': { rate: 55, count: 1 }
             }
