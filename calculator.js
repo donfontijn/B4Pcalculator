@@ -79,6 +79,17 @@ createApp({
                 const workingDaysPerYear = activity.workingDaysPerMonth * 12;
                 const savedHoursPerYear = (savedTimePerDay * workingDaysPerYear) / 3600;
                 const savings = savedHoursPerYear * this.roles[activity.role].rate * activity.peopleCount;
+                
+                console.log('Debug:', { 
+                    role: activity.role,
+                    savedTimePerDay, 
+                    workingDaysPerYear, 
+                    savedHoursPerYear, 
+                    rate: this.roles[activity.role].rate,
+                    peopleCount: activity.peopleCount,
+                    savings 
+                });
+                
                 totalYearlySavings += savings;
             });
 
