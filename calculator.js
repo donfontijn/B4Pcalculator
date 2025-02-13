@@ -39,7 +39,7 @@ createApp({
                 newTime: '',
                 frequency: '',
                 workingDaysPerMonth: '',
-                showSettings: false,
+                showSettings: true,  // Start with settings open
                 showImpact: false
             });
         },
@@ -365,6 +365,14 @@ createApp({
         },
         getYearlyTotalForRole(role) {
             return this.getTotalImpactForRole(role);
+        },
+        isActivityComplete(activity) {
+            return activity.name && 
+                   activity.role && 
+                   activity.currentTime && 
+                   activity.newTime && 
+                   activity.frequency && 
+                   activity.workingDaysPerMonth;
         }
     },
     mounted() {
@@ -386,16 +394,12 @@ createApp({
     watch: {
         activities: {
             deep: true,
-            handler(newVal) {
-                console.log('Activities changed');
-                // Clear existing chart
-                if (this.chart) {
-                    this.chart.destroy();
-                    this.chart = null;
-                }
-                // Create new chart
-                this.$nextTick(() => {
-                    this.updateChart();
+            handler(activities) {
+                activities.forEach(activity => {
+                    // Auto-open impact when all fields are filled
+                    if (this.isActivityComplete(activity)) {
+                        activity.showImpact = true;
+                    }
                 });
             }
         },
