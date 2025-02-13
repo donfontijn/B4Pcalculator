@@ -35,24 +35,16 @@ createApp({
                 id: Date.now(),
                 name: '',
                 role: Object.keys(this.roles)[0],
-                currentTime: '',
-                newTime: '',
-                frequency: '',
-                workingDaysPerMonth: '',
-                showSettings: true,  // Start with settings open
+                currentTime: 0,
+                newTime: 0,
+                frequency: 1,
+                workingDaysPerMonth: 16.92,
+                showSettings: false,
                 showImpact: false
             });
         },
         removeActivity(index) {
             this.activities.splice(index, 1);
-        },
-        isActivityComplete(activity) {
-            return activity.name && 
-                   activity.role && 
-                   activity.currentTime > 0 && 
-                   activity.newTime >= 0 && 
-                   activity.frequency > 0 && 
-                   activity.workingDaysPerMonth > 0;
         },
         formatTime(seconds) {
             if (seconds >= 60) {
@@ -152,24 +144,16 @@ createApp({
         },
         calculateImpactPerPerson(activity) {
             const beschikbaarheidsFactor = this.calculateAvailabilityFactor();
-            
-            // Convert input values to numbers and apply corrections
-            const currentTime = Number(activity.currentTime) || 0;
-            const newTime = Number(activity.newTime) || 0;
-            const frequency = Number(activity.frequency) || 0;
-            const inputDays = Number(activity.workingDaysPerMonth) || 0;
-            
-            // Apply correction factor for working days (16.92/20)
-            const correctedWorkingDays = Math.min(inputDays, 20) * (16.92/20);
+            const werkdagenCorrectionFactor = 16.92/20; // Correct for max 20 days in frontend
             
             // Time saved per item in minutes
-            const timePerItem = ((currentTime - newTime) / 60);
+            const timePerItem = ((activity.currentTime - activity.newTime) / 60);
             
             // Daily savings in hours with availability factor
-            const dailySavingsHours = (timePerItem * frequency * beschikbaarheidsFactor) / 60;
+            const dailySavingsHours = (timePerItem * activity.frequency * beschikbaarheidsFactor) / 60;
             
-            // Yearly savings in hours
-            const yearlyHours = dailySavingsHours * (correctedWorkingDays * 12);
+            // Yearly savings in hours (using corrected working days)
+            const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * werkdagenCorrectionFactor * 12);
             
             // Cost savings (single person)
             return yearlyHours * this.roles[activity.role].rate;
@@ -373,28 +357,6 @@ createApp({
         },
         getYearlyTotalForRole(role) {
             return this.getTotalImpactForRole(role);
-        },
-        isActivityComplete(activity) {
-            return activity.name && 
-                   activity.role && 
-                   activity.currentTime > 0 && 
-                   activity.newTime >= 0 && 
-                   activity.frequency > 0 && 
-                   activity.workingDaysPerMonth > 0;
-        }
-    },
-    watch: {
-        activities: {
-            deep: true,
-            handler(activities) {
-                activities.forEach(activity => {
-                    if (this.isActivityComplete(activity)) {
-                        activity.showImpact = true;
-                    } else {
-                        activity.showImpact = false;
-                    }
-                });
-            }
         }
     },
     mounted() {
@@ -416,14 +378,16 @@ createApp({
     watch: {
         activities: {
             deep: true,
-            handler(activities) {
-                activities.forEach(activity => {
-                    // Auto-open impact when all fields are filled
-                    if (this.isActivityComplete(activity)) {
-                        activity.showImpact = true;
-                    } else {
-                        activity.showImpact = false;
-                    }
+            handler(newVal) {
+                console.log('Activities changed');
+                // Clear existing chart
+                if (this.chart) {
+                    this.chart.destroy();
+                    this.chart = null;
+                }
+                // Create new chart
+                this.$nextTick(() => {
+                    this.updateChart();
                 });
             }
         },
