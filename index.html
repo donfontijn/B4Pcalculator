@@ -281,6 +281,72 @@
         </div>
     </div>
 
+    <!-- PDF Report Template -->
+    <template id="pdf-template">
+        <div class="bg-white p-8">
+            <!-- Header -->
+            <h1 class="text-2xl text-gray-800 mb-4">Business Case Impact</h1>
+            <p class="text-gray-500">Innovatie: {{ innovationName || 'Naamloos' }}</p>
+            <p class="text-gray-500 mb-6">Gegenereerd op: {{ new Date().toLocaleString('nl-NL') }}</p>
+
+            <!-- Groene impact box -->
+            <div class="bg-green-100 border border-green-500 rounded-lg p-4 mb-8">
+                <h2 class="text-gray-800 font-medium">Verwachte Jaarlijkse Besparing (Realistisch Scenario)</h2>
+                <div class="text-2xl font-bold mt-2">€{{ formatMoney(getYearlyImpact()) }}</div>
+                <div class="text-sm text-gray-600 mt-1">
+                    <span>Optimistisch scenario (100%): €{{ formatMoney(getYearlyImpact() / 0.7) }}</span>
+                    <span class="ml-4">Conservatief scenario (50%): €{{ formatMoney((getYearlyImpact() / 0.7) * 0.5) }}</span>
+                </div>
+            </div>
+
+            <!-- Activities Table -->
+            <div class="mb-8">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="text-left text-gray-500 py-2 px-4">Activiteit</th>
+                            <th class="text-left text-gray-500 py-2 px-4">Rol</th>
+                            <th class="text-left text-gray-500 py-2 px-4">Huidige</th>
+                            <th class="text-left text-gray-500 py-2 px-4">Nieuwe</th>
+                            <th class="text-left text-gray-500 py-2 px-4">Freq.</th>
+                            <th class="text-left text-gray-500 py-2 px-4">Dagen</th>
+                            <th class="text-left text-gray-500 py-2 px-4">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="activity in activities" :key="activity.id" class="border-t border-gray-200">
+                            <td class="py-2 px-4">{{ activity.name || 'Naamloze activiteit' }}</td>
+                            <td class="py-2 px-4">{{ activity.role }}</td>
+                            <td class="py-2 px-4">{{ activity.currentTime }}s</td>
+                            <td class="py-2 px-4">{{ activity.newTime }}s</td>
+                            <td class="py-2 px-4">{{ activity.frequency }}x</td>
+                            <td class="py-2 px-4">{{ activity.workingDaysPerMonth }}d</td>
+                            <td class="py-2 px-4">€{{ formatMoney(getYearlyImpactPerPerson(activity)) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Impact per rol boxes -->
+            <div class="grid gap-4">
+                <div v-for="(roleData, role) in roles" :key="role" 
+                     class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h3 class="text-gray-800 font-medium">{{ role }} ({{ roleData.count }}p)</h3>
+                    <div class="mt-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-800">Totaal:</span>
+                            <span class="font-medium">€{{ formatMoney(getYearlyTotalForRole(role)) }}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Per persoon:</span>
+                            <span>€{{ formatMoney(getYearlyPerPersonForRole(role)) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <script src="calculator.js"></script>
 </body>
 </html>
