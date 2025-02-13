@@ -229,26 +229,51 @@ createApp({
         },
         downloadPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Get the PDF template
-            const template = document.getElementById('pdf-template');
-            
-            // Generate PDF using the template
-            doc.html(template, {
-                callback: function (doc) {
-                    // Save the PDF
-                    const cleanFileName = (this.innovationName || 'innovatie')
-                        .toLowerCase()
-                        .replace(/[^a-z0-9]/g, '-')
-                        .replace(/-+/g, '-')
-                        .replace(/^-|-$/g, '');
-                    
-                    doc.save(`${cleanFileName}-impact-rapport.pdf`);
-                },
-                x: 15,
-                y: 15
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
             });
+
+            doc.autoTable({
+                html: '#pdf-template',
+                theme: 'striped',
+                styles: {
+                    cellPadding: 5,
+                    fontSize: 10,
+                    font: 'helvetica',
+                    textColor: [50, 50, 50],
+                    lineColor: [220, 220, 220],
+                    lineWidth: 0.5,
+                },
+                headStyles: {
+                    fillColor: [240, 240, 240],
+                    textColor: [50, 50, 50],
+                    fontStyle: 'bold',
+                },
+                bodyStyles: {
+                    fillColor: [255, 255, 255],
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 245, 245],
+                },
+                margin: { top: 20, right: 15, bottom: 20, left: 15 },
+                startY: 20,
+                didDrawPage: function(data) {
+                    // Header
+                    doc.setFontSize(20);
+                    doc.text('Business Case Impact', 15, 15);
+                }
+            });
+
+            // Save the PDF
+            const cleanFileName = (this.innovationName || 'innovatie')
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            
+            doc.save(`${cleanFileName}-impact-rapport.pdf`);
         },
         getTotalImpactForRole(role) {
             return this.activities
