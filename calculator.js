@@ -39,6 +39,7 @@ createApp({
                 newTime: '',
                 frequency: '',
                 workingDaysPerMonth: '',
+                showSettings: true,  // Start with settings open
                 showImpact: false
             });
         },

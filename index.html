@@ -51,50 +51,63 @@
                         </button>
                     </div>
 
-                    <!-- Calculation Section (Always Open) -->
+                    <!-- Calculation Section -->
                     <div class="p-4 bg-gray-50 border-t">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Huidige tijd (seconden)</label>
-                                <input 
-                                    type="number" 
-                                    v-model="activity.currentTime" 
-                                    class="form-input w-full rounded-md border-gray-300"
-                                    min="0"
-                                    placeholder="Vul aantal seconden in"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Nieuwe tijd (seconden)</label>
-                                <input 
-                                    type="number" 
-                                    v-model="activity.newTime" 
-                                    class="form-input w-full rounded-md border-gray-300"
-                                    min="0"
-                                    placeholder="Vul aantal seconden in"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Frequentie per dag</label>
-                                <input 
-                                    type="number" 
-                                    v-model="activity.frequency" 
-                                    class="form-input w-full rounded-md border-gray-300"
-                                    min="0"
-                                    placeholder="Hoe vaak per dag?"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Werkdagen met activiteit per maand</label>
-                                <input 
-                                    type="number" 
-                                    v-model="activity.workingDaysPerMonth" 
-                                    class="form-input w-full rounded-md border-gray-300"
-                                    min="0"
-                                    max="20"
-                                    placeholder="Maximum 20 dagen"
-                                >
-                                <p class="text-sm text-gray-500 mt-1">Maximum 20 dagen per maand</p>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium">Berekening</span>
+                            <button 
+                                @click="activity.showSettings = !activity.showSettings" 
+                                class="text-gray-600 hover:text-gray-900"
+                            >
+                                <svg class="w-4 h-4 transition-transform" :class="activity.showSettings ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div v-if="activity.showSettings">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Huidige tijd (seconden)</label>
+                                    <input 
+                                        type="number" 
+                                        v-model="activity.currentTime" 
+                                        class="form-input w-full rounded-md border-gray-300"
+                                        min="0"
+                                        placeholder="Vul aantal seconden in"
+                                    >
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nieuwe tijd (seconden)</label>
+                                    <input 
+                                        type="number" 
+                                        v-model="activity.newTime" 
+                                        class="form-input w-full rounded-md border-gray-300"
+                                        min="0"
+                                        placeholder="Vul aantal seconden in"
+                                    >
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Frequentie per dag</label>
+                                    <input 
+                                        type="number" 
+                                        v-model="activity.frequency" 
+                                        class="form-input w-full rounded-md border-gray-300"
+                                        min="0"
+                                        placeholder="Hoe vaak per dag?"
+                                    >
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Werkdagen met activiteit per maand</label>
+                                    <input 
+                                        type="number" 
+                                        v-model="activity.workingDaysPerMonth" 
+                                        class="form-input w-full rounded-md border-gray-300"
+                                        min="0"
+                                        max="20"
+                                        placeholder="Maximum 20 dagen"
+                                    >
+                                    <p class="text-sm text-gray-500 mt-1">Maximum 20 dagen per maand</p>
+                                </div>
                             </div>
                         </div>
                     </div>
