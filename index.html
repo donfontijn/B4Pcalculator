@@ -41,8 +41,10 @@
 
                         <div>
                             <label class="block mb-2">Rol</label>
-                            <select v-model="activity.role" class="w-full p-2 border rounded">
-                                <option v-for="(data, role) in roles" :key="role" :value="role">{{ role }}</option>
+                            <select v-model="activity.role" class="form-select ...">
+                                <option v-for="(data, role) in roles" :key="role" :value="role">
+                                    {{ role }} ({{ data.count }}p)
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -99,16 +101,16 @@
                             class="absolute left-0 top-full mt-2 p-4 bg-white rounded-lg shadow-lg border border-gray-200 w-80 z-10"
                         >
                             <p class="text-sm text-gray-600 mb-3">
-                                Bij het beoordelen van de financiële impact van dit innovatievoorstel is het belangrijk om rekening te houden met onzekerheden rondom het gebruik van de ontwikkelde scripts en tools. Hoewel de potentiële besparingen aanzienlijk zijn, varieert de frequentie waarmee de scripts worden ingezet per project.
+                                Bij het beoordelen van de financiële impact van elk innovatievoorstel is het belangrijk om rekening te houden met onzekerheden rondom het gebruik van de ontwikkelde innnovatie. Hoewel de potentiële besparingen aanzienlijk zijn, varieert de frequentie waarmee de innovaties worden ingezet per project.
                             </p>
                             <p class="text-sm text-gray-600 mb-3">
-                                Deze berekening is gebaseerd op het totaal aantal medewerkers per rol (bijvoorbeeld 8 junior modellers) en hun respectievelijke uurtarieven.
+                                Onderstaande berekening is gebaseerd op het totaal aantal medewerkers per rol (bijvoorbeeld 8 junior modellers) en hun respectievelijke uurtarieven.
                             </p>
                             <p class="text-sm text-gray-600">We presenteren drie scenario's:</p>
                             <ul class="list-disc pl-5 text-sm text-gray-600">
-                                <li>Optimistisch scenario: Het maximale gebruik van de scripts (100%)</li>
-                                <li>Realistisch scenario: Een gematigd gebruik van de scripts (70%)</li>
-                                <li>Conservatief scenario: Minder frequent gebruik van de scripts (50%)</li>
+                                <li>Optimistisch scenario: Het maximale gebruik van de innovatie (100%)</li>
+                                <li>Realistisch scenario: Een gematigd gebruik van de innovatie (70%)</li>
+                                <li>Conservatief scenario: Minder frequent gebruik van de innovatie (50%)</li>
                             </ul>
                         </div>
                     </div>
@@ -133,30 +135,37 @@
                 <div class="grid grid-cols-3 gap-4 mt-6">
                     <div>
                         <h5 class="font-medium mb-4">Wekelijks per rol</h5>
-                        <div v-for="activity in activities" :key="activity.id" class="mb-4">
-                            <p class="font-medium">{{ activity.role }}:</p>
-                            <p>€{{ formatMoney(getWeeklyImpactPerPerson(activity) * 0.7) }}</p>
-                            <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getWeeklyImpactPerPerson(activity)) }}</p>
-                            <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getWeeklyImpactPerPerson(activity) * 0.5) }}</p>
-                        </div>
+                        <template v-for="role in Object.keys(roles)" :key="role">
+                            <!-- Calculate total impact for this role across all activities -->
+                            <div v-if="getTotalImpactForRole(role) > 0" class="mb-4">
+                                <p class="font-medium">{{ role }} ({{ roles[role].count }}p):</p>
+                                <p>€{{ formatMoney(getWeeklyTotalForRole(role) * 0.7) }}</p>
+                                <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getWeeklyTotalForRole(role)) }}</p>
+                                <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getWeeklyTotalForRole(role) * 0.5) }}</p>
+                            </div>
+                        </template>
                     </div>
                     <div>
                         <h5 class="font-medium mb-4">Maandelijks per rol</h5>
-                        <div v-for="activity in activities" :key="activity.id" class="mb-4">
-                            <p class="font-medium">{{ activity.role }}:</p>
-                            <p>€{{ formatMoney(getMonthlyImpactPerPerson(activity) * 0.7) }}</p>
-                            <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getMonthlyImpactPerPerson(activity)) }}</p>
-                            <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getMonthlyImpactPerPerson(activity) * 0.5) }}</p>
-                        </div>
+                        <template v-for="role in Object.keys(roles)" :key="role">
+                            <div v-if="getTotalImpactForRole(role) > 0" class="mb-4">
+                                <p class="font-medium">{{ role }} ({{ roles[role].count }}p):</p>
+                                <p>€{{ formatMoney(getMonthlyTotalForRole(role) * 0.7) }}</p>
+                                <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getMonthlyTotalForRole(role)) }}</p>
+                                <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getMonthlyTotalForRole(role) * 0.5) }}</p>
+                            </div>
+                        </template>
                     </div>
                     <div>
                         <h5 class="font-medium mb-4">Jaarlijks per rol</h5>
-                        <div v-for="activity in activities" :key="activity.id" class="mb-4">
-                            <p class="font-medium">{{ activity.role }}:</p>
-                            <p>€{{ formatMoney(getYearlyImpactPerPerson(activity) * 0.7) }}</p>
-                            <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getYearlyImpactPerPerson(activity)) }}</p>
-                            <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getYearlyImpactPerPerson(activity) * 0.5) }}</p>
-                        </div>
+                        <template v-for="role in Object.keys(roles)" :key="role">
+                            <div v-if="getTotalImpactForRole(role) > 0" class="mb-4">
+                                <p class="font-medium">{{ role }} ({{ roles[role].count }}p):</p>
+                                <p>€{{ formatMoney(getYearlyTotalForRole(role) * 0.7) }}</p>
+                                <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getYearlyTotalForRole(role)) }}</p>
+                                <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getYearlyTotalForRole(role) * 0.5) }}</p>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </div>

@@ -291,6 +291,20 @@ createApp({
                 .replace(/^-|-$/g, '');
             
             doc.save(`${cleanFileName}-impact-rapport.pdf`);
+        },
+        getTotalImpactForRole(role) {
+            return this.activities
+                .filter(activity => activity.role === role)
+                .reduce((total, activity) => total + this.calculateImpactPerPerson(activity), 0);
+        },
+        getWeeklyTotalForRole(role) {
+            return this.getTotalImpactForRole(role) / 52;
+        },
+        getMonthlyTotalForRole(role) {
+            return this.getTotalImpactForRole(role) / 12;
+        },
+        getYearlyTotalForRole(role) {
+            return this.getTotalImpactForRole(role);
         }
     },
     mounted() {
