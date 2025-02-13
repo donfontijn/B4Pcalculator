@@ -4,24 +4,18 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>B4P Innovatie Impact Calculator</title>
-        <!-- Load scripts in correct order -->
+        <!-- Load core scripts -->
         <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-        <!-- Tailwind CSS via CDN with integrity and crossorigin -->
-        <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
+        <!-- Alternative Tailwind CSS CDN -->
+        <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
         <!-- Base styles -->
         <style>
             [v-cloak] { display: none; }
             body { margin: 0; padding: 0; }
-            .form-input {
-                width: 100%;
-                padding: 0.5rem;
-                border: 1px solid #e2e8f0;
-                border-radius: 0.375rem;
-            }
-            .form-select {
+            .form-input, .form-select {
                 width: 100%;
                 padding: 0.5rem;
                 border: 1px solid #e2e8f0;
