@@ -11,12 +11,21 @@ createApp({
             roles: {
                 'BIM Regisseur': { rate: 85, count: 1 },
                 'BIM Coordinatoren': { rate: 60, count: 2 },
-                'Quality Engineers': { rate: 55, count: 2 },
+                'Quality Engineers': { rate: 60, count: 2 },
                 'BIM Modelleur - Junior': { rate: 40, count: 8 },
                 'BIM Modelleur - Senior': { rate: 55, count: 8 },
-                'Teamcaptain': { rate: 55, count: 3 },
+                'Teamcaptain': { rate: 60, count: 2 },
                 'Projectmanagers': { rate: 55, count: 2 },
                 'Softwaredeveloper': { rate: 55, count: 1 }
+            },
+            // Availability calculation factors
+            availabilityFactors: {
+                totalWorkDaysPerYear: 260,
+                hoursPerDay: 8,
+                nationalHolidays: 48,    // hours
+                leaveHours: 200,         // vacation/ADV hours
+                sicknessPercentage: 5,   // 5%
+                otherUnavailablePercentage: 5  // 5%
             }
         }
     },
@@ -24,13 +33,13 @@ createApp({
         addActivity() {
             this.activities.push({
                 id: Date.now(),
-                name: '',
                 role: Object.keys(this.roles)[0],
-                currentTime: 30,
-                newTime: 15,
+                currentTime: 0,
+                newTime: 0,
                 frequency: 1,
-                workingDaysPerMonth: 20,
-                peopleCount: this.roles[Object.keys(this.roles)[0]].count
+                workingDaysPerMonth: 16.92,
+                showSettings: false,
+                showImpact: false
             });
         },
         removeActivity(index) {
@@ -72,15 +81,45 @@ createApp({
         getYearlyImpactPerRole(role) {
             return this.calculateImpactPerRole(role);
         },
+        calculateAvailabilityFactor() {
+            const totalYearlyHours = this.availabilityFactors.totalWorkDaysPerYear * this.availabilityFactors.hoursPerDay;
+            
+            // Calculate deductions
+            const sickHours = (totalYearlyHours * this.availabilityFactors.sicknessPercentage) / 100;
+            const otherUnavailableHours = (totalYearlyHours * this.availabilityFactors.otherUnavailablePercentage) / 100;
+            const totalDeductions = this.availabilityFactors.nationalHolidays + 
+                                  this.availabilityFactors.leaveHours + 
+                                  sickHours + 
+                                  otherUnavailableHours;
+
+            // Calculate net available hours
+            const netAvailableHours = totalYearlyHours - totalDeductions;
+            
+            console.log('Availability calculation:', {
+                totalYearlyHours,
+                deductions: {
+                    nationalHolidays: this.availabilityFactors.nationalHolidays,
+                    leaveHours: this.availabilityFactors.leaveHours,
+                    sickHours,
+                    otherUnavailableHours,
+                    total: totalDeductions
+                },
+                netAvailableHours,
+                factor: netAvailableHours / totalYearlyHours
+            });
+
+            return netAvailableHours / totalYearlyHours;
+        },
         calculateImpact() {
             let totalYearlySavings = 0;
+            const beschikbaarheidsFactor = this.calculateAvailabilityFactor();
 
             this.activities.forEach(activity => {
                 // Time saved per item in minutes
-                const timePerItem = ((activity.currentTime - activity.newTime) / 60); // Convert seconds to minutes
+                const timePerItem = ((activity.currentTime - activity.newTime) / 60);
                 
-                // Daily savings in hours
-                const dailySavingsHours = (timePerItem * activity.frequency) / 60; // Convert minutes to hours
+                // Daily savings in hours with availability factor
+                const dailySavingsHours = (timePerItem * activity.frequency * beschikbaarheidsFactor) / 60;
                 
                 // Yearly savings in hours
                 const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * 12);
@@ -88,17 +127,28 @@ createApp({
                 // Cost savings (multiply by number of people in role)
                 const savings = yearlyHours * this.roles[activity.role].rate * this.roles[activity.role].count;
 
+                console.log('Debug calculation:', {
+                    timePerItem,
+                    dailySavingsHours,
+                    yearlyHours,
+                    beschikbaarheidsFactor,
+                    rate: this.roles[activity.role].rate,
+                    savings
+                });
+
                 totalYearlySavings += savings;
             });
 
             return totalYearlySavings;
         },
         calculateImpactPerPerson(activity) {
+            const beschikbaarheidsFactor = this.calculateAvailabilityFactor();
+            
             // Time saved per item in minutes
             const timePerItem = ((activity.currentTime - activity.newTime) / 60);
             
-            // Daily savings in hours
-            const dailySavingsHours = (timePerItem * activity.frequency) / 60;
+            // Daily savings in hours with availability factor
+            const dailySavingsHours = (timePerItem * activity.frequency * beschikbaarheidsFactor) / 60;
             
             // Yearly savings in hours
             const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * 12);
