@@ -39,7 +39,7 @@ createApp({
                 newTime: '',
                 frequency: '',
                 workingDaysPerMonth: '',
-                showSettings: true,  // Changed: starts open
+                showSettings: true,  // Start with settings open
                 showImpact: false
             });
         },
