@@ -9,11 +9,10 @@ createApp({
             updateChartTimeout: null,
             showInfo: false,
             roles: {
-                'BIM Regisseur': { rate: 85, count: 1 },
+                'BIM Regisseur': { rate: 85, count: 1.5 },
                 'BIM Coordinatoren': { rate: 60, count: 2 },
-                'Quality Engineers': { rate: 60, count: 2 },
-                'BIM Modelleur - Junior': { rate: 40, count: 8 },
-                'BIM Modelleur - Senior': { rate: 55, count: 8 },
+                'Quality Engineers': { rate: 60, count: 1.5 },
+                'BIM Modelleur': { rate: 46.42, count: 15 },
                 'Teamcaptain': { rate: 60, count: 2 },
                 'Projectmanagers': { rate: 55, count: 2 },
                 'Softwaredeveloper': { rate: 55, count: 1 }
@@ -37,8 +36,8 @@ createApp({
                 role: Object.keys(this.roles)[0],
                 currentTime: 0,
                 newTime: 0,
-                frequency: 1,
-                workingDaysPerMonth: 16.92,
+                frequency: 0,
+                workingDaysPerMonth: 0,  // Set default to 0
                 showSettings: false,
                 showImpact: false
             });
@@ -55,32 +54,63 @@ createApp({
             return `${seconds}s`;
         },
         formatMoney(amount) {
-            return Math.round(amount).toLocaleString();
+            return Math.round(amount).toLocaleString('nl-NL');
         },
         getDailySaved(activity) {
             return (activity.currentTime - activity.newTime) * activity.frequency;
         },
-        calculateImpactPerRole(role) {
-            let totalImpact = 0;
-            this.activities.forEach(activity => {
-                if (activity.role === role) {
-                    const savedTimePerDay = this.getDailySaved(activity);
-                    const workingDaysPerYear = activity.workingDaysPerMonth * 12;
-                    const savedHoursPerYear = (savedTimePerDay * workingDaysPerYear) / 3600;
-                    const savings = savedHoursPerYear * this.roles[role].rate;
-                    totalImpact += savings;
-                }
-            });
-            return totalImpact / this.roles[role].count; // Per person in role
+        calculateBaseImpact(activity) {
+            if (!activity || !activity.role || !this.roles[activity.role]) return 0;
+            const timePerItem = ((activity.currentTime - activity.newTime) / 3600);
+            const dailySavingsHours = timePerItem * activity.frequency * 0.8;
+            const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * 12);
+            return yearlyHours * this.roles[activity.role].rate;
         },
-        getWeeklyImpactPerRole(role) {
-            return this.calculateImpactPerRole(role) / 52; // Divide yearly impact by 52 weeks
+        getWeeklyImpactPerPerson(activity) {
+            return (this.calculateBaseImpact(activity) * 0.7) / 52;
         },
-        getMonthlyImpactPerRole(role) {
-            return this.calculateImpactPerRole(role) / 12; // Divide yearly impact by 12 months
+        getMonthlyImpactPerPerson(activity) {
+            return (this.calculateBaseImpact(activity) * 0.7) / 12;
         },
-        getYearlyImpactPerRole(role) {
-            return this.calculateImpactPerRole(role);
+        getYearlyImpactPerPerson(activity) {
+            if (!activity || !activity.role) return 0;
+            const baseImpact = this.calculateBaseImpact(activity);
+            return baseImpact * this.roles[activity.role].count * 0.7;
+        },
+        getYearlyImpact() {
+            return this.activities.reduce((sum, activity) => {
+                const baseImpact = this.calculateBaseImpact(activity);
+                return sum + (baseImpact * this.roles[activity.role].count);
+            }, 0) * 0.7;
+        },
+        getMonthlyImpact() {
+            return this.getYearlyImpact() / 12;
+        },
+        getWeeklyImpact() {
+            return this.getYearlyImpact() / 52;
+        },
+        getYearlyTotalForRole(role) {
+            if (!role || !this.roles[role]) return 0;
+            return this.activities
+                .filter(a => a.role === role)
+                .reduce((sum, activity) => {
+                    return sum + this.calculateBaseImpact(activity);
+                }, 0) * 0.7;
+        },
+        getMonthlyTotalForRole(role) {
+            return this.getYearlyTotalForRole(role) / 12;
+        },
+        getWeeklyTotalForRole(role) {
+            return this.getYearlyTotalForRole(role) / 52;
+        },
+        getYearlyPerPersonForRole(role) {
+            return this.getYearlyTotalForRole(role) / this.roles[role].count;  // €9,663 / 1.5 = €6,442
+        },
+        getMonthlyPerPersonForRole(role) {
+            return this.getMonthlyTotalForRole(role) / this.roles[role].count;
+        },
+        getWeeklyPerPersonForRole(role) {
+            return this.getWeeklyTotalForRole(role) / this.roles[role].count;
         },
         calculateAvailabilityFactor() {
             const totalYearlyHours = this.availabilityFactors.totalWorkDaysPerYear * this.availabilityFactors.hoursPerDay;
@@ -111,37 +141,6 @@ createApp({
 
             return netAvailableHours / totalYearlyHours;
         },
-        calculateImpact() {
-            let totalYearlySavings = 0;
-            const beschikbaarheidsFactor = this.calculateAvailabilityFactor();
-
-            this.activities.forEach(activity => {
-                // Time saved per item in minutes
-                const timePerItem = ((activity.currentTime - activity.newTime) / 60);
-                
-                // Daily savings in hours with availability factor
-                const dailySavingsHours = (timePerItem * activity.frequency * beschikbaarheidsFactor) / 60;
-                
-                // Yearly savings in hours
-                const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * 12);
-                
-                // Cost savings (multiply by number of people in role)
-                const savings = yearlyHours * this.roles[activity.role].rate * this.roles[activity.role].count;
-
-                console.log('Debug calculation:', {
-                    timePerItem,
-                    dailySavingsHours,
-                    yearlyHours,
-                    beschikbaarheidsFactor,
-                    rate: this.roles[activity.role].rate,
-                    savings
-                });
-
-                totalYearlySavings += savings;
-            });
-
-            return totalYearlySavings;
-        },
         calculateImpactPerPerson(activity) {
             const beschikbaarheidsFactor = this.calculateAvailabilityFactor();
             const werkdagenCorrectionFactor = 16.92/20; // Correct for max 20 days in frontend
@@ -158,24 +157,6 @@ createApp({
             // Cost savings (single person)
             return yearlyHours * this.roles[activity.role].rate;
         },
-        getYearlyImpactPerPerson(activity) {
-            return this.calculateImpactPerPerson(activity);
-        },
-        getMonthlyImpactPerPerson(activity) {
-            return this.calculateImpactPerPerson(activity) / 12;
-        },
-        getWeeklyImpactPerPerson(activity) {
-            return this.calculateImpactPerPerson(activity) / 52;
-        },
-        getYearlyImpact() {
-            return this.calculateImpact();
-        },
-        getMonthlyImpact() {
-            return this.calculateImpact() / 12;
-        },
-        getWeeklyImpact() {
-            return this.getMonthlyImpact() / 4.33;
-        },
         updateChart() {
             console.log('Updating chart...');
             const ctx = document.getElementById('impactChart');
@@ -184,11 +165,9 @@ createApp({
                 return;
             }
 
-            const weeklyImpact = this.getWeeklyImpact();
-            const monthlyImpact = this.getMonthlyImpact();
             const yearlyImpact = this.getYearlyImpact();
-
-            console.log('Impacts:', { weeklyImpact, monthlyImpact, yearlyImpact });
+            const monthlyImpact = yearlyImpact / 12;
+            const weeklyImpact = yearlyImpact / 52;
 
             const data = {
                 labels: ['Wekelijks', 'Maandelijks', 'Jaarlijks'],
@@ -217,8 +196,10 @@ createApp({
                 ]
             };
 
-            if (!this.chart) {
-                console.log('Creating new chart');
+            if (this.chart) {
+                this.chart.data = data;
+                this.chart.update('none');
+            } else {
                 this.chart = new Chart(ctx, {
                     type: 'bar',
                     data: data,
@@ -244,10 +225,6 @@ createApp({
                         }
                     }
                 });
-            } else {
-                console.log('Updating existing chart');
-                this.chart.data = data;
-                this.chart.update('none');
             }
         },
         downloadPDF() {
@@ -349,14 +326,11 @@ createApp({
                 .filter(activity => activity.role === role)
                 .reduce((total, activity) => total + this.calculateImpactPerPerson(activity), 0);
         },
-        getWeeklyTotalForRole(role) {
-            return this.getTotalImpactForRole(role) / 52;
+        getMonthlyFromYearly(amount) {
+            return amount / 12;
         },
-        getMonthlyTotalForRole(role) {
-            return this.getTotalImpactForRole(role) / 12;
-        },
-        getYearlyTotalForRole(role) {
-            return this.getTotalImpactForRole(role);
+        getWeeklyFromYearly(amount) {
+            return amount / 52;
         }
     },
     mounted() {
