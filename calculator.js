@@ -35,10 +35,10 @@ createApp({
                 id: Date.now(),
                 name: '',
                 role: Object.keys(this.roles)[0],
-                currentTime: 0,
-                newTime: 0,
-                frequency: 1,
-                workingDaysPerMonth: 16.92,
+                currentTime: '',
+                newTime: '',
+                frequency: '',
+                workingDaysPerMonth: '',
                 showSettings: false,
                 showImpact: false
             });
@@ -144,16 +144,24 @@ createApp({
         },
         calculateImpactPerPerson(activity) {
             const beschikbaarheidsFactor = this.calculateAvailabilityFactor();
-            const werkdagenCorrectionFactor = 16.92/20; // Correct for max 20 days in frontend
+            
+            // Convert input values to numbers and apply corrections
+            const currentTime = Number(activity.currentTime) || 0;
+            const newTime = Number(activity.newTime) || 0;
+            const frequency = Number(activity.frequency) || 0;
+            const inputDays = Number(activity.workingDaysPerMonth) || 0;
+            
+            // Apply correction factor for working days (16.92/20)
+            const correctedWorkingDays = Math.min(inputDays, 20) * (16.92/20);
             
             // Time saved per item in minutes
-            const timePerItem = ((activity.currentTime - activity.newTime) / 60);
+            const timePerItem = ((currentTime - newTime) / 60);
             
             // Daily savings in hours with availability factor
-            const dailySavingsHours = (timePerItem * activity.frequency * beschikbaarheidsFactor) / 60;
+            const dailySavingsHours = (timePerItem * frequency * beschikbaarheidsFactor) / 60;
             
-            // Yearly savings in hours (using corrected working days)
-            const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * werkdagenCorrectionFactor * 12);
+            // Yearly savings in hours
+            const yearlyHours = dailySavingsHours * (correctedWorkingDays * 12);
             
             // Cost savings (single person)
             return yearlyHours * this.roles[activity.role].rate;
