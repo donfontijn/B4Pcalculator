@@ -39,12 +39,20 @@ createApp({
                 newTime: '',
                 frequency: '',
                 workingDaysPerMonth: '',
-                showSettings: true,  // Start with settings open
+                showSettings: true,  // Changed: starts open
                 showImpact: false
             });
         },
         removeActivity(index) {
             this.activities.splice(index, 1);
+        },
+        isActivityComplete(activity) {
+            return activity.name && 
+                   activity.role && 
+                   activity.currentTime > 0 && 
+                   activity.newTime >= 0 && 
+                   activity.frequency > 0 && 
+                   activity.workingDaysPerMonth > 0;
         },
         formatTime(seconds) {
             if (seconds >= 60) {
@@ -373,6 +381,20 @@ createApp({
                    activity.newTime >= 0 && 
                    activity.frequency > 0 && 
                    activity.workingDaysPerMonth > 0;
+        }
+    },
+    watch: {
+        activities: {
+            deep: true,
+            handler(activities) {
+                activities.forEach(activity => {
+                    if (this.isActivityComplete(activity)) {
+                        activity.showImpact = true;
+                    } else {
+                        activity.showImpact = false;
+                    }
+                });
+            }
         }
     },
     mounted() {
