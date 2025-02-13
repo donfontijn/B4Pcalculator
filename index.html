@@ -51,33 +51,20 @@
                         </button>
                     </div>
 
-                    <!-- Toggle Buttons -->
+                    <!-- Toggle for Berekening -->
                     <div class="px-4 py-2 border-t">
                         <div class="flex justify-between items-center">
                             <button 
-                                @click="activity.showSettings = !activity.showSettings" 
+                                @click="activity.toggles.berekening = !activity.toggles.berekening" 
                                 class="flex items-center gap-2 px-3 py-2 rounded-md border"
-                                :class="activity.showSettings ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'"
+                                :class="activity.toggles.berekening ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'"
                             >
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                                 Berekening
-                                <svg class="w-4 h-4 transition-transform" :class="activity.showSettings ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <button 
-                                @click="activity.showImpact = !activity.showImpact" 
-                                class="flex items-center gap-2 px-3 py-2 rounded-md border"
-                                :class="activity.showImpact ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'"
-                            >
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg>
-                                Impact
-                                <svg class="w-4 h-4 transition-transform" :class="activity.showImpact ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 transition-transform" :class="activity.toggles.berekening ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
@@ -85,7 +72,7 @@
                     </div>
 
                     <!-- Calculation Section -->
-                    <div class="p-4 bg-gray-50 border-t" v-if="activity.showSettings">
+                    <div class="p-4 bg-gray-50 border-t" v-if="activity.toggles.berekening">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Huidige tijd (seconden)</label>
@@ -130,29 +117,46 @@
                                 <p class="text-sm text-gray-500 mt-1">Maximum 20 dagen per maand</p>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Impact Section -->
-                    <div v-if="activity.showImpact" class="p-4 bg-blue-50 border-t">
-                        <h4 class="font-medium mb-3">Impact van deze activiteit</h4>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div>
-                                <p class="text-sm font-medium text-gray-700">Wekelijks</p>
-                                <p class="text-lg">€{{ formatMoney(getWeeklyImpactPerPerson(activity) * 0.7) }}</p>
-                                <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getWeeklyImpactPerPerson(activity)) }}</p>
-                                <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getWeeklyImpactPerPerson(activity) * 0.5) }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-700">Maandelijks</p>
-                                <p class="text-lg">€{{ formatMoney(getMonthlyImpactPerPerson(activity) * 0.7) }}</p>
-                                <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getMonthlyImpactPerPerson(activity)) }}</p>
-                                <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getMonthlyImpactPerPerson(activity) * 0.5) }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-700">Jaarlijks</p>
-                                <p class="text-lg">€{{ formatMoney(getYearlyImpactPerPerson(activity) * 0.7) }}</p>
-                                <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getYearlyImpactPerPerson(activity)) }}</p>
-                                <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getYearlyImpactPerPerson(activity) * 0.5) }}</p>
+                        <!-- Impact Toggle Button -->
+                        <div class="mt-4 border-t pt-4">
+                            <button 
+                                @click="activity.toggles.impact = !activity.toggles.impact" 
+                                class="flex items-center gap-2 px-3 py-2 rounded-md border"
+                                :class="activity.toggles.impact ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                                Impact
+                                <svg class="w-4 h-4 transition-transform" :class="activity.toggles.impact ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Impact Section -->
+                        <div v-if="activity.toggles.impact" class="mt-4 p-4 bg-blue-50 rounded-lg">
+                            <h4 class="font-medium mb-3">Impact van deze activiteit</h4>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700">Wekelijks</p>
+                                    <p class="text-lg">€{{ formatMoney(getWeeklyImpactPerPerson(activity) * 0.7) }}</p>
+                                    <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getWeeklyImpactPerPerson(activity)) }}</p>
+                                    <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getWeeklyImpactPerPerson(activity) * 0.5) }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700">Maandelijks</p>
+                                    <p class="text-lg">€{{ formatMoney(getMonthlyImpactPerPerson(activity) * 0.7) }}</p>
+                                    <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getMonthlyImpactPerPerson(activity)) }}</p>
+                                    <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getMonthlyImpactPerPerson(activity) * 0.5) }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700">Jaarlijks</p>
+                                    <p class="text-lg">€{{ formatMoney(getYearlyImpactPerPerson(activity) * 0.7) }}</p>
+                                    <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getYearlyImpactPerPerson(activity)) }}</p>
+                                    <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getYearlyImpactPerPerson(activity) * 0.5) }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -181,7 +185,7 @@
                             class="absolute left-0 top-full mt-2 p-4 bg-white rounded-lg shadow-lg border border-gray-200 w-80 z-10"
                         >
                             <p class="text-sm text-gray-600 mb-3">
-                                Bij het beoordelen van de financiële impact van elk innovatievoorstel is het belangrijk om rekening te houden met onzekerheden rondom het gebruik van de ontwikkelde innnovatie. Hoewel de potentiële besparingen aanzienlijk zijn, varieert de frequentie waarmee de innovaties worden ingezet per project.
+                                Bij het beoordelen van de financiële impact van elk innovatievoorstel is het belangrijk om rekening te houden met onzekerheden rondom het gebruik van de ontwikkelde innovatie. Hoewel de potentiële besparingen aanzienlijk zijn, varieert de frequentie waarmee de innovaties worden ingezet per project.
                             </p>
                             <p class="text-sm text-gray-600 mb-3">
                                 Onderstaande berekening is gebaseerd op het totaal aantal medewerkers per rol (bijvoorbeeld 8 junior modellers) en hun respectievelijke uurtarieven.
@@ -189,104 +193,4 @@
                             <p class="text-sm text-gray-600">We presenteren drie scenario's:</p>
                             <ul class="list-disc pl-5 text-sm text-gray-600">
                                 <li>Optimistisch scenario: Het maximale gebruik van de innovatie (100%)</li>
-                                <li>Realistisch scenario: Een gematigd gebruik van de innovatie (70%)</li>
-                                <li>Conservatief scenario: Minder frequent gebruik van de innovatie (50%)</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Green block with main impact -->
-                <div class="bg-green-100 p-4 rounded-lg mb-6">
-                    <h4 class="text-lg font-medium mb-2">Verwachte Jaarlijkse Besparing (Realistisch Scenario)</h4>
-                    <p class="text-3xl font-bold mb-2">€{{ formatMoney(getYearlyImpact() * 0.7) }}</p>
-                    <div class="text-sm text-gray-600">
-                        <p>Optimistisch scenario (100%): €{{ formatMoney(getYearlyImpact()) }}</p>
-                        <p>Conservatief scenario (50%): €{{ formatMoney(getYearlyImpact() * 0.5) }}</p>
-                    </div>
-                </div>
-
-                <!-- Chart -->
-                <div class="mb-6" style="height: 300px;">
-                    <canvas id="impactChart"></canvas>
-                </div>
-
-                <!-- Role breakdown section -->
-                <div class="mt-8">
-                    <!-- Column headers with background -->
-                    <div class="grid grid-cols-3 gap-4 mb-4 bg-blue-50 p-3 rounded-t-lg">
-                        <h5 class="font-semibold text-blue-900">Wekelijkse Impact</h5>
-                        <h5 class="font-semibold text-blue-900">Maandelijkse Impact</h5>
-                        <h5 class="font-semibold text-blue-900">Jaarlijkse Impact</h5>
-                    </div>
-
-                    <!-- Role breakdown grid -->
-                    <div class="grid grid-cols-3 gap-4">
-                        <template v-for="role in Object.keys(roles)" :key="role">
-                            <!-- Weekly column -->
-                            <div v-if="getTotalImpactForRole(role) > 0" class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4">
-                                <p class="font-semibold text-gray-800 border-b pb-2">{{ role }} ({{ roles[role].count }}p)</p>
-                                <!-- Total for role population with all scenarios -->
-                                <div class="my-3 pb-3 border-b">
-                                    <p class="font-medium text-gray-700">Totaal:</p>
-                                    <p class="text-lg">€{{ formatMoney(getWeeklyTotalForRole(role) * roles[role].count * 0.7) }}</p>
-                                    <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getWeeklyTotalForRole(role) * roles[role].count) }}</p>
-                                    <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getWeeklyTotalForRole(role) * roles[role].count * 0.5) }}</p>
-                                </div>
-                                <!-- Per person -->
-                                <div>
-                                    <p class="font-medium text-gray-700">Per persoon:</p>
-                                    <p class="text-lg">€{{ formatMoney(getWeeklyTotalForRole(role) * 0.7) }}</p>
-                                    <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getWeeklyTotalForRole(role)) }}</p>
-                                    <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getWeeklyTotalForRole(role) * 0.5) }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Monthly column -->
-                            <div v-if="getTotalImpactForRole(role) > 0" class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4">
-                                <p class="font-semibold text-gray-800 border-b pb-2">{{ role }} ({{ roles[role].count }}p)</p>
-                                <div class="my-3 pb-3 border-b">
-                                    <p class="font-medium text-gray-700">Totaal:</p>
-                                    <p class="text-lg">€{{ formatMoney(getMonthlyTotalForRole(role) * roles[role].count * 0.7) }}</p>
-                                    <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getMonthlyTotalForRole(role) * roles[role].count) }}</p>
-                                    <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getMonthlyTotalForRole(role) * roles[role].count * 0.5) }}</p>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-700">Per persoon:</p>
-                                    <p class="text-lg">€{{ formatMoney(getMonthlyTotalForRole(role) * 0.7) }}</p>
-                                    <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getMonthlyTotalForRole(role)) }}</p>
-                                    <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getMonthlyTotalForRole(role) * 0.5) }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Yearly column -->
-                            <div v-if="getTotalImpactForRole(role) > 0" class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4">
-                                <p class="font-semibold text-gray-800 border-b pb-2">{{ role }} ({{ roles[role].count }}p)</p>
-                                <div class="my-3 pb-3 border-b">
-                                    <p class="font-medium text-gray-700">Totaal:</p>
-                                    <p class="text-lg">€{{ formatMoney(getYearlyTotalForRole(role) * roles[role].count * 0.7) }}</p>
-                                    <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getYearlyTotalForRole(role) * roles[role].count) }}</p>
-                                    <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getYearlyTotalForRole(role) * roles[role].count * 0.5) }}</p>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-700">Per persoon:</p>
-                                    <p class="text-lg">€{{ formatMoney(getYearlyTotalForRole(role) * 0.7) }}</p>
-                                    <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getYearlyTotalForRole(role)) }}</p>
-                                    <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getYearlyTotalForRole(role) * 0.5) }}</p>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mt-8 flex justify-center">
-            <button @click="downloadPDF" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium">
-                PDF Rapport Downloaden
-            </button>
-        </div>
-    </div>
-
-    <script src="calculator.js"></script>
-</body>
-</html>
+                                <li>Realistisch scenario: Een gematigd gebruik van de innov
