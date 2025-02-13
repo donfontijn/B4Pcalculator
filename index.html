@@ -136,11 +136,15 @@
                     <div>
                         <h5 class="font-medium mb-4">Wekelijks per rol</h5>
                         <template v-for="role in Object.keys(roles)" :key="role">
-                            <!-- Calculate total impact for this role across all activities -->
+                            <!-- Only show roles that have activities -->
                             <div v-if="getTotalImpactForRole(role) > 0" class="mb-4">
                                 <p class="font-medium">{{ role }} ({{ roles[role].count }}p):</p>
-                                <p>€{{ formatMoney(getWeeklyTotalForRole(role) * 0.7) }}</p>
+                                <!-- Total for role population -->
+                                <p>Totaal: €{{ formatMoney(getWeeklyTotalForRole(role) * roles[role].count * 0.7) }}</p>
+                                <!-- Per person -->
+                                <p class="text-sm text-gray-600">Per persoon:</p>
                                 <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getWeeklyTotalForRole(role)) }}</p>
+                                <p class="text-sm text-gray-600">Realistisch: €{{ formatMoney(getWeeklyTotalForRole(role) * 0.7) }}</p>
                                 <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getWeeklyTotalForRole(role) * 0.5) }}</p>
                             </div>
                         </template>
@@ -150,8 +154,12 @@
                         <template v-for="role in Object.keys(roles)" :key="role">
                             <div v-if="getTotalImpactForRole(role) > 0" class="mb-4">
                                 <p class="font-medium">{{ role }} ({{ roles[role].count }}p):</p>
-                                <p>€{{ formatMoney(getMonthlyTotalForRole(role) * 0.7) }}</p>
+                                <!-- Total for role population -->
+                                <p>Totaal: €{{ formatMoney(getMonthlyTotalForRole(role) * roles[role].count * 0.7) }}</p>
+                                <!-- Per person -->
+                                <p class="text-sm text-gray-600">Per persoon:</p>
                                 <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getMonthlyTotalForRole(role)) }}</p>
+                                <p class="text-sm text-gray-600">Realistisch: €{{ formatMoney(getMonthlyTotalForRole(role) * 0.7) }}</p>
                                 <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getMonthlyTotalForRole(role) * 0.5) }}</p>
                             </div>
                         </template>
@@ -161,8 +169,12 @@
                         <template v-for="role in Object.keys(roles)" :key="role">
                             <div v-if="getTotalImpactForRole(role) > 0" class="mb-4">
                                 <p class="font-medium">{{ role }} ({{ roles[role].count }}p):</p>
-                                <p>€{{ formatMoney(getYearlyTotalForRole(role) * 0.7) }}</p>
+                                <!-- Total for role population -->
+                                <p>Totaal: €{{ formatMoney(getYearlyTotalForRole(role) * roles[role].count * 0.7) }}</p>
+                                <!-- Per person -->
+                                <p class="text-sm text-gray-600">Per persoon:</p>
                                 <p class="text-sm text-gray-600">Optimistisch: €{{ formatMoney(getYearlyTotalForRole(role)) }}</p>
+                                <p class="text-sm text-gray-600">Realistisch: €{{ formatMoney(getYearlyTotalForRole(role) * 0.7) }}</p>
                                 <p class="text-sm text-gray-600">Conservatief: €{{ formatMoney(getYearlyTotalForRole(role) * 0.5) }}</p>
                             </div>
                         </template>
