@@ -33,6 +33,7 @@ createApp({
         addActivity() {
             this.activities.push({
                 id: Date.now(),
+                name: '',
                 role: Object.keys(this.roles)[0],
                 currentTime: 0,
                 newTime: 0,
@@ -143,6 +144,7 @@ createApp({
         },
         calculateImpactPerPerson(activity) {
             const beschikbaarheidsFactor = this.calculateAvailabilityFactor();
+            const werkdagenCorrectionFactor = 16.92/20; // Correct for max 20 days in frontend
             
             // Time saved per item in minutes
             const timePerItem = ((activity.currentTime - activity.newTime) / 60);
@@ -150,8 +152,8 @@ createApp({
             // Daily savings in hours with availability factor
             const dailySavingsHours = (timePerItem * activity.frequency * beschikbaarheidsFactor) / 60;
             
-            // Yearly savings in hours
-            const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * 12);
+            // Yearly savings in hours (using corrected working days)
+            const yearlyHours = dailySavingsHours * (activity.workingDaysPerMonth * werkdagenCorrectionFactor * 12);
             
             // Cost savings (single person)
             return yearlyHours * this.roles[activity.role].rate;
