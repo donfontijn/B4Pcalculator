@@ -39,7 +39,6 @@ createApp({
                 newTime: '',
                 frequency: '',
                 workingDaysPerMonth: '',
-                showSettings: true,  // Start with settings open
                 showImpact: false
             });
         },
@@ -369,10 +368,10 @@ createApp({
         isActivityComplete(activity) {
             return activity.name && 
                    activity.role && 
-                   activity.currentTime && 
-                   activity.newTime && 
-                   activity.frequency && 
-                   activity.workingDaysPerMonth;
+                   activity.currentTime > 0 && 
+                   activity.newTime >= 0 && 
+                   activity.frequency > 0 && 
+                   activity.workingDaysPerMonth > 0;
         }
     },
     mounted() {
@@ -399,6 +398,8 @@ createApp({
                     // Auto-open impact when all fields are filled
                     if (this.isActivityComplete(activity)) {
                         activity.showImpact = true;
+                    } else {
+                        activity.showImpact = false;
                     }
                 });
             }

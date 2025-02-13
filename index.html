@@ -29,65 +29,30 @@
             <div class="space-y-6">
                 <div v-for="(activity, index) in activities" :key="activity.id" class="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 overflow-hidden">
                     <!-- Activity Header -->
-                    <div class="p-4 bg-gray-50 border-b">
-                        <div class="flex justify-between items-center mb-3">
-                            <div class="flex items-center gap-4 flex-1">
-                                <input 
-                                    type="text" 
-                                    v-model="activity.name" 
-                                    placeholder="Naam activiteit" 
-                                    class="form-input rounded-md border-gray-300 flex-1"
-                                >
-                                <select 
-                                    v-model="activity.role" 
-                                    class="form-select rounded-md border-gray-300 w-64"
-                                >
-                                    <option v-for="(data, role) in roles" :key="role" :value="role">
-                                        {{ role }} ({{ data.count }}p)
-                                    </option>
-                                </select>
-                                <button @click="removeActivity(index)" class="text-red-500 hover:text-red-700">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Toggle Buttons -->
-                        <div class="flex gap-2">
-                            <button 
-                                @click="activity.showSettings = !activity.showSettings" 
-                                class="flex items-center gap-2 px-3 py-2 rounded-md border"
-                                :class="activity.showSettings ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'"
-                            >
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                </svg>
-                                Berekening
-                                <svg class="w-4 h-4 transition-transform" :class="activity.showSettings ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            
-                            <button 
-                                @click="activity.showImpact = !activity.showImpact" 
-                                class="flex items-center gap-2 px-3 py-2 rounded-md border"
-                                :class="activity.showImpact ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'"
-                            >
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg>
-                                Impact
-                                <svg class="w-4 h-4 transition-transform" :class="activity.showImpact ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                        </div>
+                    <div class="p-4 flex items-center justify-between gap-4">
+                        <input 
+                            type="text" 
+                            v-model="activity.name" 
+                            placeholder="Naam activiteit" 
+                            class="form-input rounded-md border-gray-300 flex-1"
+                        >
+                        <select 
+                            v-model="activity.role" 
+                            class="form-select rounded-md border-gray-300 w-64"
+                        >
+                            <option v-for="(data, role) in roles" :key="role" :value="role">
+                                {{ role }} ({{ data.count }}p)
+                            </option>
+                        </select>
+                        <button @click="removeActivity(index)" class="text-red-500 hover:text-red-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
                     </div>
 
-                    <!-- Basic Info - Always Visible -->
-                    <div class="p-4">
+                    <!-- Calculation Section (Always Open) -->
+                    <div class="p-4 bg-gray-50 border-t">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Huidige tijd (seconden)</label>
@@ -134,52 +99,21 @@
                         </div>
                     </div>
 
-                    <!-- Settings Section -->
-                    <div v-if="activity.showSettings" class="p-4 bg-gray-50 border-t">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Huidige tijd (seconden)</label>
-                                <input 
-                                    type="number" 
-                                    v-model="activity.currentTime" 
-                                    class="form-input w-full rounded-md border-gray-300"
-                                    min="0"
-                                    placeholder="Vul aantal seconden in"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Nieuwe tijd (seconden)</label>
-                                <input 
-                                    type="number" 
-                                    v-model="activity.newTime" 
-                                    class="form-input w-full rounded-md border-gray-300"
-                                    min="0"
-                                    placeholder="Vul aantal seconden in"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Frequentie per dag</label>
-                                <input 
-                                    type="number" 
-                                    v-model="activity.frequency" 
-                                    class="form-input w-full rounded-md border-gray-300"
-                                    min="0"
-                                    placeholder="Hoe vaak per dag?"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Werkdagen met activiteit per maand</label>
-                                <input 
-                                    type="number" 
-                                    v-model="activity.workingDaysPerMonth" 
-                                    class="form-input w-full rounded-md border-gray-300"
-                                    min="0"
-                                    max="20"
-                                    placeholder="Maximum 20 dagen"
-                                >
-                                <p class="text-sm text-gray-500 mt-1">Maximum 20 dagen per maand</p>
-                            </div>
-                        </div>
+                    <!-- Impact Toggle Button -->
+                    <div class="px-4 py-2 border-t">
+                        <button 
+                            @click="activity.showImpact = !activity.showImpact" 
+                            class="flex items-center gap-2 px-3 py-2 rounded-md border w-full"
+                            :class="activity.showImpact ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Impact
+                            <svg class="w-4 h-4 transition-transform ml-auto" :class="activity.showImpact ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
                     </div>
 
                     <!-- Impact Section -->
